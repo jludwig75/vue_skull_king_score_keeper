@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  skull_king_score_keeper:
+    security_opt:
+      - apparmor:unconfined
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - USERNAME=${USERNAME}
+    volumes:
+      - .:/home/${USERNAME}/workspace
+      - ~/.ssh:/home/vivint/.ssh
+      - /dev:/dev
+      - /run/udev:/run/udev:ro
+      - /var/run/dbus/:/var/run/dbus/
+    ports:
+      - "8000:8000"  # Port forwarding: host_port:container_port
+    # Other configurations specific to Rust development container

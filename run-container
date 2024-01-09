@@ -1,0 +1,4 @@
+#!/bin/sh
+
+./build-image
+docker compose run --rm skull_king_score_keeper /bin/bash
