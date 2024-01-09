@@ -1,18 +1,18 @@
 <template>
   <v-card>
     <v-card-title>
-      <span>{{ player_round.player.name }}</span>
-      <span class="trick_count">Score: {{ player_round.get_accumulative_score() }}</span>
-      <span class="trick_count">Round Score: {{ player_round.get_score() }}</span>
+      <span class="player_round_title_first_item">{{ player_round.player.name }}</span>
+      <span class="player_round_title_item">Round Score: {{ player_round.get_score() }}</span>
+      <span class="player_round_title_item">Game Score: {{ player_round.get_accumulative_score() }}</span>
     </v-card-title>
     <v-card-text>
-      <span class="trick_count" v-if="player_round.tricks_bid != null">Tricks Bid: {{ player_round.tricks_bid
+      <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Tricks Bid:</b> {{ player_round.tricks_bid
       }}</span>
-      <span class="trick_count" v-else>Tricks Bid: </span>
       <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 0" v-model="bid_dialog"
         persistent width="400">
         <template v-slot:activator="{ props }">
-          <v-btn v-bind="props">Set Bid</v-btn>
+          <v-btn v-if="player_round.tricks_bid == null" v-bind="props">Set Bid</v-btn>
+          <v-btn v-else v-bind="props" icon><v-icon>mdi-pencil</v-icon></v-btn>
         </template>
         <v-card>
           <v-card-title>
@@ -31,12 +31,13 @@
         </v-card>
       </v-dialog>
       <span v-if="player_round.round.all_bids_placed()">
-        <span class="trick_count" v-if="player_round.tricks_won != null">Tricks Won: {{ player_round.tricks_won
+        <span class="trick_count" v-if="player_round.tricks_won != null"><b>Tricks Won:</b> {{ player_round.tricks_won
         }}</span>
         <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="won_dialog"
           persistent width="400">
           <template v-slot:activator="{ props }">
-            <v-btn v-bind="props">Set Tricks Won</v-btn>
+            <v-btn v-if="player_round.tricks_won == null" v-bind="props">Set Tricks Won</v-btn>
+            <v-btn v-else v-bind="props" icon><v-icon>mdi-pencil</v-icon></v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -111,6 +112,19 @@ export default {
 </script>
 
 <style scoped>
+.player_round_title_first_item {
+  width: 10em;
+  display: inline-block;
+  padding-right: 1em;
+}
+
+.player_round_title_item {
+  width: 10em;
+  display: inline-block;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
 .trick_count {
   padding-left: 1em;
   padding-right: 1em;

@@ -276,6 +276,9 @@ class Game {
         if (this.players.length < 2) {
             return false;
         }
+        if (this.rounds.length == 10) {
+            return false;
+        }
         if (this.rounds.length == 0) {
             return true;
         } else {
