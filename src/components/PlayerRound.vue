@@ -8,7 +8,7 @@
     <v-card-text>
       <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Tricks Bid:</b> {{ player_round.tricks_bid
       }}</span>
-      <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 0" v-model="bid_dialog"
+      <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="bid_dialog"
         persistent width="400">
         <template v-slot:activator="{ props }">
           <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Set Bid</v-btn>
@@ -34,7 +34,7 @@
       <span v-if="player_round.round.all_bids_placed()">
         <span class="trick_count" v-if="player_round.tricks_won != null"><b>Tricks Won:</b> {{ player_round.tricks_won
         }}</span>
-        <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="won_dialog"
+        <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 2" v-model="won_dialog"
           persistent width="400">
           <template v-slot:activator="{ props }">
             <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Set Tricks Won</v-btn>

@@ -136,9 +136,10 @@ class PlayerRound {
 }
 
 const RoundState = {
-    BIDDING: 0,
-    SCORING: 1,
-    COMPLETE: 2,
+    NEW: 0,
+    BIDDING: 1,
+    SCORING: 2,
+    COMPLETE: 3,
 }
 
 class Round {
@@ -150,10 +151,19 @@ class Round {
             this.player_rounds.push(new PlayerRound(this, round_number, player));
         }
         this.available_bonuses = [CaptureBonuses.GREEN_14, CaptureBonuses.YELLOW_14, CaptureBonuses.PURPLE_14, CaptureBonuses.BLACK_14];
-        this.state = RoundState.BIDDING;
+        this.state = RoundState.NEW;
     }
 
     start() {
+        if (this.state != RoundState.NEW) {
+            return false;
+        }
+
+        this.state = RoundState.BIDDING;
+        return true;
+    }
+
+    start_playing() {
         if (this.state != RoundState.BIDDING || !this.all_bids_placed()) {
             return false;
         }

@@ -43,7 +43,7 @@
       <v-card-text>
         <v-btn color="primary" v-if="game.can_start_new_round()" @click="start_round()">
           <span v-if="game.rounds.length == 0">Start Game</span>
-          <span v-else>Start Next Round</span>
+          <span v-else>Go To Next Round</span>
         </v-btn>
       </v-card-text>
     </v-card>
@@ -63,7 +63,7 @@ export default {
     return {
       game: new Game(),
       dialog: false,
-      new_player_name: ''
+      new_player_name: '',
     };
   },
   created() {
@@ -81,7 +81,7 @@ export default {
     },
     delete_player(index) {
       this.game.players.splice(index, 1);
-    }
+    },
   }
 }
 </script>
