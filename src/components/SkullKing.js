@@ -40,6 +40,8 @@ class PlayerRound {
         this.player = player;
         this.bonuses = []
         this.alliances = [];
+        this.tricks_bid = null;
+        this.tricks_won = null;
     }
 
     set_tricks_bid(tricks_bid) {
@@ -61,12 +63,16 @@ class PlayerRound {
         } // else handle error
     }
 
+    bid_placed() {
+        return this.tricks_bid != null;
+    }
+
     won_bid() {
         return this.tricks_won == this.tricks_bid;
     }
 
     get_score() {
-        if (!('tricks_bid' in this) || !('tricks_won' in this)) {
+        if (this.tricks_bid == null || this.tricks_won == null) {
             return null;
         }
         let score = 0;
@@ -103,16 +109,79 @@ class PlayerRound {
 
         return score;
     }
+
+    get_accumulative_score() {
+        let round_score = this.get_score();
+        if (round_score == null) {
+            return null;
+        }
+
+
+        let previous_round = this.get_previous_player_round();
+        if (previous_round) {
+            return previous_round.get_accumulative_score() + round_score;
+        }
+
+        return round_score;
+    }
+
+    get_previous_player_round() {
+        let previous_round = this.round.get_previous_round();
+        if (!previous_round) {
+            return null;
+        }
+
+        return previous_round.get_player_round(this.player);
+    }
+}
+
+const RoundState = {
+    BIDDING: 0,
+    SCORING: 1,
+    COMPLETE: 2,
 }
 
 class Round {
-    constructor(round_number, players) {
+    constructor(game, round_number, players) {
+        this.game = game
         this.round_number = round_number
         this.player_rounds = [];
         for (const player of players) {
             this.player_rounds.push(new PlayerRound(this, round_number, player));
         }
         this.available_bonuses = [CaptureBonuses.GREEN_14, CaptureBonuses.YELLOW_14, CaptureBonuses.PURPLE_14, CaptureBonuses.BLACK_14];
+        this.state = RoundState.BIDDING;
+    }
+
+    start() {
+        if (this.state != RoundState.BIDDING || !this.all_bids_placed()) {
+            return false;
+        }
+
+        this.state = RoundState.SCORING;
+        return true;
+    }
+
+    end() {
+        if (this.state != RoundState.SCORING || !this.all_tricks_won_set()) {
+            return false;
+        }
+
+        this.state = RoundState.COMPLETE;
+        return true;
+    }
+
+    is_current_round() {
+        return this.game.get_current_round() == this;
+    }
+
+    all_bids_placed() {
+        for (const player_round of this.player_rounds) {
+            if (!player_round.bid_placed()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     claim_bonus(bonus) {
@@ -138,7 +207,7 @@ class Round {
         return null;
     }
 
-    is_complete() {
+    all_tricks_won_set() {
         for (const player_round of this.player_rounds) {
             if (player_round.get_score() == null) {
                 return false;
@@ -146,6 +215,14 @@ class Round {
         }
 
         return true;
+    }
+
+    get_previous_round() {
+        if (this.round_number <= 1) {
+            return null;
+        }
+
+        return this.game.get_round(this.round_number - 1);
     }
 }
 
@@ -164,7 +241,7 @@ class Game {
             return null;
         }
 
-        let round = new Round(this.rounds.length + 1, this.players);
+        let round = new Round(this, this.rounds.length + 1, this.players);
         this.rounds.push(round);
         return round;
     }
@@ -175,6 +252,14 @@ class Game {
         }
 
         return this.rounds[this.rounds.length - 1];
+    }
+
+    get_round(round_number) {
+        if (round_number <= 0 || round_number > this.rounds.length) {
+            return null;
+        }
+
+        return this.rounds[round_number - 1];
     }
 
     get_player_by_name(player_name) {
@@ -196,11 +281,11 @@ class Game {
         } else {
             let current_round = this.get_current_round();
             if (current_round) {
-                return current_round.is_complete();
+                return current_round.state == RoundState.COMPLETE;
             } // else handle error
         }
         return false;
     }
 }
 
-module.exports = { Game, Alliance, CaptureBonuses };
+module.exports = { Game, Alliance, CaptureBonuses, RoundState };

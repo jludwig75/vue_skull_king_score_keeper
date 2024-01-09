@@ -67,6 +67,8 @@ export default {
     };
   },
   created() {
+    this.game.add_player("Jonathan");
+    this.game.add_player("Deneen");
   },
   methods: {
     on_dialog_add_button() {
