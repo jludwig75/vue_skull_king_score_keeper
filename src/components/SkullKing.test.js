@@ -69,9 +69,10 @@ test('Test more advanced game functionality', () => {
     // Add bonuses
     player_round_joe.add_bonus(SuitBonuses.GREEN);
     player_round_mary.add_bonus(SuitBonuses.YELLOW);
+    player_round_sue.add_bonus(SuitBonuses.BLACK);
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(50);
-    expect(player_round_sue.get_score()).toBe(30);
+    expect(player_round_sue.get_score()).toBe(50);
 
     // Add an alliance
     let alliance = new Alliance(player_mary, player_sue);
@@ -80,5 +81,5 @@ test('Test more advanced game functionality', () => {
 
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(70);
-    expect(player_round_sue.get_score()).toBe(50);
+    expect(player_round_sue.get_score()).toBe(70);
 });
