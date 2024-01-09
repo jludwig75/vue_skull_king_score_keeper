@@ -224,6 +224,14 @@ class Round {
 
         return this.game.get_round(this.round_number - 1);
     }
+
+    total_tricks_won() {
+        let tricks_won = 0;
+        for (const player_round of this.player_rounds) {
+            tricks_won += player_round.tricks_won;
+        }
+        return tricks_won;
+    }
 }
 
 class Game {
