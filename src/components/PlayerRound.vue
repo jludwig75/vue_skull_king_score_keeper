@@ -1,7 +1,11 @@
 <template>
-    <div>
-        {{ player_round.player.name }}
-    </div>
+    <v-card>
+        <v-card-title>
+            {{ player_round.player.name }}
+        </v-card-title>
+        <v-card-text>
+        </v-card-text>
+    </v-card>
 </template>
 
 <script>

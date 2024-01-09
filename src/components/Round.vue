@@ -1,8 +1,12 @@
 <template>
-    <div v-if="round != null">
-        Round {{ round.round_number }}
-        <PlayerRound v-for="player_round in round.player_rounds" :key="player_round" :player_round="player_round" />
-    </div>
+    <v-card v-if="round != null">
+        <v-card-title>
+            Round {{ round.round_number }}
+        </v-card-title>
+        <v-card-text>
+            <PlayerRound v-for="player_round in round.player_rounds" :key="player_round" :player_round="player_round" />
+        </v-card-text>
+    </v-card>
 </template>
 
 <script>

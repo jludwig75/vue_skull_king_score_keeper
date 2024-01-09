@@ -137,6 +137,16 @@ class Round {
         }
         return null;
     }
+
+    is_complete() {
+        for (const player_round of this.player_rounds) {
+            if (player_round.get_score() == null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 class Game {
@@ -159,6 +169,14 @@ class Game {
         return round;
     }
 
+    get_current_round() {
+        if (this.rounds.length == 0) {
+            return null;
+        }
+
+        return this.rounds[this.rounds.length - 1];
+    }
+
     get_player_by_name(player_name) {
         for (const player of this.players) {
             if (player.name === player_name) {
@@ -167,6 +185,21 @@ class Game {
         }
 
         return null;
+    }
+
+    can_start_new_round() {
+        if (this.players.length < 2) {
+            return false;
+        }
+        if (this.rounds.length == 0) {
+            return true;
+        } else {
+            let current_round = this.get_current_round();
+            if (current_round) {
+                return current_round.is_complete();
+            } // else handle error
+        }
+        return false;
     }
 }
 
