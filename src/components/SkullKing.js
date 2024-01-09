@@ -33,6 +33,8 @@ const CaptureBonuses = {
     MERMAID: { name: 'Mermaid', points: 20 }
 }
 
+const AllCaptureBonsues = [CaptureBonuses.GREEN_14, CaptureBonuses.YELLOW_14, CaptureBonuses.PURPLE_14, CaptureBonuses.BLACK_14, CaptureBonuses.SKULL_KING, CaptureBonuses.MERMAID, CaptureBonuses.PIRATE]
+
 class PlayerRound {
     constructor(round, round_number, player) {
         this.round = round;
@@ -56,10 +58,18 @@ class PlayerRound {
         this.alliances.push(alliance);
     }
 
-    add_bonus(bonus) {
+    claim_bonus(bonus) {
         let bonus_to_claim = this.round.claim_bonus(bonus);
         if (bonus_to_claim) {
             this.bonuses.push(bonus_to_claim);
+        } // else handle error
+    }
+
+    relinquish_bonus(bonus) {
+        let bonus_index = this.bonuses.indexOf(bonus);
+        if (bonus_index != -1) {
+            this.bonuses.splice(bonus_index, 1);
+            this.round.return_bonus(bonus);
         } // else handle error
     }
 
@@ -150,7 +160,7 @@ class Round {
         for (const player of players) {
             this.player_rounds.push(new PlayerRound(this, round_number, player));
         }
-        this.available_bonuses = [CaptureBonuses.GREEN_14, CaptureBonuses.YELLOW_14, CaptureBonuses.PURPLE_14, CaptureBonuses.BLACK_14];
+        this.available_bonuses = AllCaptureBonsues.slice();
         this.state = RoundState.NEW;
     }
 
@@ -206,6 +216,12 @@ class Round {
         }
 
         return null;
+    }
+
+    return_bonus(bonus) {
+        if (!this.available_bonuses.includes(bonus)) {
+            this.available_bonuses.push(bonus);
+        } // else handle error
     }
 
     get_player_round(player) {

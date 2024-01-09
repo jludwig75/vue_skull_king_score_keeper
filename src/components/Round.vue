@@ -65,7 +65,7 @@ export default {
         this.show_yo_ho_ho = false;
         this.round.start();
       }, 5000); // 3000 milliseconds = 3 seconds
-    }
+    },
   }
 }
 </script>

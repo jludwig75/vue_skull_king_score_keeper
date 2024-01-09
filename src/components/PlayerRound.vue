@@ -6,63 +6,90 @@
       <span class="player_round_title_item">Game Score: {{ player_round.get_accumulative_score() }}</span>
     </v-card-title>
     <v-card-text>
-      <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Tricks Bid:</b> {{ player_round.tricks_bid
-      }}</span>
-      <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="bid_dialog"
-        persistent width="400">
-        <template v-slot:activator="{ props }">
-          <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Set Bid</v-btn>
-          <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            Set Bid
-          </v-card-title>
-          <v-card-text>
-            <span class="clickable-icon" v-for="index in bid_options()" :key="index" @click="set_bid_count(index)">{{
-              index
+      <v-container fluid>
+        <v-row>
+          <v-col cols="4">
+            <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Tricks Bid:</b> {{ player_round.tricks_bid
             }}</span>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue-darken-1" variant="text" @click="bid_dialog = false">
-              Cancel
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <span v-if="player_round.round.all_bids_placed()">
-        <span class="trick_count" v-if="player_round.tricks_won != null"><b>Tricks Won:</b> {{ player_round.tricks_won
-        }}</span>
-        <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 2" v-model="won_dialog"
-          persistent width="400">
-          <template v-slot:activator="{ props }">
-            <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Set Tricks Won</v-btn>
-            <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
-          </template>
-          <v-card>
-            <v-card-title>
-              Set Tricks Won
-            </v-card-title>
-            <v-card-text>
-              <span class="clickable-icon" v-for="index in bid_options()" :key="index" @click="set_won_count(index)">{{
-                index
+            <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="bid_dialog"
+              persistent width="400">
+              <template v-slot:activator="{ props }">
+                <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Set Bid</v-btn>
+                <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  Set Bid
+                </v-card-title>
+                <v-card-text>
+                  <span class="clickable-icon" v-for="index in bid_options()" :key="index"
+                    @click="set_bid_count(index)">{{
+                      index
+                    }}</span>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue-darken-1" variant="text" @click="bid_dialog = false">
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <span v-if="player_round.round.all_bids_placed()">
+              <span class="trick_count" v-if="player_round.tricks_won != null"><b>Tricks Won:</b> {{
+                player_round.tricks_won
               }}</span>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue-darken-1" variant="text" @click="won_dialog = false">
-                Cancel
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </span>
+              <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 2" v-model="won_dialog"
+                persistent width="400">
+                <template v-slot:activator="{ props }">
+                  <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Set Tricks Won</v-btn>
+                  <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    Set Tricks Won
+                  </v-card-title>
+                  <v-card-text>
+                    <span class="clickable-icon" v-for="index in bid_options()" :key="index"
+                      @click="set_won_count(index)">{{
+                        index
+                      }}</span>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue-darken-1" variant="text" @click="won_dialog = false">
+                      Cancel
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </span>
+          </v-col>
+          <v-col cols="8">
+            <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
+              <h3>Available Bonsues</h3>
+              <v-chip-group>
+                <v-chip v-for="capture_bonus in player_round.round.available_bonuses" :key="capture_bonus"
+                  @click="claim_bonus(capture_bonus)">{{ capture_bonus.name }}</v-chip>
+              </v-chip-group>
+            </span>
+            <span v-if="player_round.round.state >= 2">
+              <h3>Captured Bonsues</h3>
+              <v-chip-group>
+                <v-chip v-for="capture_bonus in player_round.bonuses" :key="capture_bonus"
+                  :closable="player_round.round.state == 2" @click:close="remove_bonus(capture_bonus)">{{
+                    capture_bonus.name }} (+{{ capture_bonus.points }} points)</v-chip>
+              </v-chip-group>
+            </span>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
+import { AllCaptureBonsues } from './SkullKing.js'
 
 export default {
   name: 'PlayerRound',
@@ -108,7 +135,16 @@ export default {
     set_won_count(number_of_tricks) {
       this.player_round.set_tricks_won(number_of_tricks);
       this.won_dialog = false;
-    }
+    },
+    available_capture_bonuses() {
+      return AllCaptureBonsues;
+    },
+    claim_bonus(bonus) {
+      this.player_round.claim_bonus(bonus);
+    },
+    remove_bonus(bonus) {
+      this.player_round.relinquish_bonus(bonus);
+    },
   }
 }
 </script>
