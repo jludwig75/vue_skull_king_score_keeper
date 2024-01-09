@@ -11,15 +11,16 @@
       <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 0" v-model="bid_dialog"
         persistent width="400">
         <template v-slot:activator="{ props }">
-          <v-btn v-if="player_round.tricks_bid == null" v-bind="props">Set Bid</v-btn>
-          <v-btn v-else v-bind="props" icon><v-icon>mdi-pencil</v-icon></v-btn>
+          <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Set Bid</v-btn>
+          <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
         </template>
         <v-card>
           <v-card-title>
             Set Bid
           </v-card-title>
           <v-card-text>
-            <span class="trick_count" v-for="index in bid_options()" :key="index" @click="set_bid_count(index)">{{ index
+            <span class="clickable-icon" v-for="index in bid_options()" :key="index" @click="set_bid_count(index)">{{
+              index
             }}</span>
           </v-card-text>
           <v-card-actions>
@@ -36,15 +37,16 @@
         <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="won_dialog"
           persistent width="400">
           <template v-slot:activator="{ props }">
-            <v-btn v-if="player_round.tricks_won == null" v-bind="props">Set Tricks Won</v-btn>
-            <v-btn v-else v-bind="props" icon><v-icon>mdi-pencil</v-icon></v-btn>
+            <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Set Tricks Won</v-btn>
+            <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
           </template>
           <v-card>
             <v-card-title>
               Set Tricks Won
             </v-card-title>
             <v-card-text>
-              <span class="trick_count" v-for="index in bid_options()" :key="index" @click="set_won_count(index)">{{ index
+              <span class="clickable-icon" v-for="index in bid_options()" :key="index" @click="set_won_count(index)">{{
+                index
               }}</span>
             </v-card-text>
             <v-card-actions>
@@ -115,18 +117,26 @@ export default {
 .player_round_title_first_item {
   width: 10em;
   display: inline-block;
-  padding-right: 1em;
+  margin-right: 1em;
 }
 
 .player_round_title_item {
   width: 10em;
   display: inline-block;
-  padding-left: 1em;
-  padding-right: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
 }
 
 .trick_count {
-  padding-left: 1em;
-  padding-right: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.clickable-icon {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
 }
 </style>
