@@ -1,4 +1,4 @@
-const { Game, Alliance, SuitBonuses } = require('./SkullKing');
+const { Game, Alliance, CaptureBonuses } = require('./SkullKing');
 
 test('Test basic game functionality', () => {
     let game = new Game();
@@ -67,9 +67,9 @@ test('Test more advanced game functionality', () => {
 
     
     // Add bonuses
-    player_round_joe.add_bonus(SuitBonuses.GREEN);
-    player_round_mary.add_bonus(SuitBonuses.YELLOW);
-    player_round_sue.add_bonus(SuitBonuses.BLACK);
+    player_round_joe.add_bonus(CaptureBonuses.GREEN_14);
+    player_round_mary.add_bonus(CaptureBonuses.YELLOW_14);
+    player_round_sue.add_bonus(CaptureBonuses.BLACK_14);
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(50);
     expect(player_round_sue.get_score()).toBe(50);

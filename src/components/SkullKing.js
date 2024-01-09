@@ -23,11 +23,14 @@ class Alliance {
 }
 
 
-const SuitBonuses = {
-    GREEN: { color: 'green', points: 10 },
-    YELLOW: { color: 'yellow', points: 10 },
-    PURPLE: { color: 'purple', points: 10 },
-    BLACK: { color: 'black', points: 20 }
+const CaptureBonuses = {
+    GREEN_14: { name: 'Green 14', points: 10 },
+    YELLOW_14: { name: 'Yellow 14', points: 10 },
+    PURPLE_14: { name: 'Purple 14', points: 10 },
+    BLACK_14: { name: 'Black 14', points: 20 },
+    SKULL_KING: { name: 'Skull King', points: 20 },
+    PIRATE: { name: 'Pirate', points: 20 },
+    MERMAID: { name: 'Mermaid', points: 20 }
 }
 
 class PlayerRound {
@@ -55,7 +58,7 @@ class PlayerRound {
         let bonus_to_claim = this.round.claim_bonus(bonus);
         if (bonus_to_claim) {
             this.bonuses.push(bonus_to_claim);
-        }
+        } // else handle error
     }
 
     won_bid() {
@@ -109,7 +112,7 @@ class Round {
         for (const player of players) {
             this.player_rounds.push(new PlayerRound(this, round_number, player));
         }
-        this.available_bonuses = [SuitBonuses.GREEN, SuitBonuses.YELLOW, SuitBonuses.PURPLE, SuitBonuses.BLACK];
+        this.available_bonuses = [CaptureBonuses.GREEN_14, CaptureBonuses.YELLOW_14, CaptureBonuses.PURPLE_14, CaptureBonuses.BLACK_14];
     }
 
     claim_bonus(bonus) {
@@ -167,4 +170,4 @@ class Game {
     }
 }
 
-module.exports = { Game, Alliance, SuitBonuses };
+module.exports = { Game, Alliance, CaptureBonuses };
