@@ -3,7 +3,7 @@
     <v-card-title>
       <span class="player_round_title_first_item">{{ player_round.player.name }}</span>
       <span class="player_round_title_item">Round Score: {{ player_round.get_score() }}</span>
-      <span class="player_round_title_item">Game Score: {{ player_round.get_accumulative_score() }}</span>
+      <span class="player_round_title_item">Game Score: {{ player_round.get_cumulative_score() }}</span>
     </v-card-title>
     <v-card-text>
       <v-container fluid>
