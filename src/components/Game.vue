@@ -26,7 +26,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
+            <v-btn color="blue-darken-1" variant="text" @click="close_dialog()">
               Cancel
             </v-btn>
             <v-btn color="blue-darken-1" variant="text" @click="on_dialog_add_button()">
@@ -80,6 +80,10 @@ export default {
     }
     console.log('Enabling game save');
     this.disable_game_save = false;
+    window.addEventListener('keydown', this.onKeyDown);
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.onKeyDown);
   },
   watch: {
     game: {
@@ -109,11 +113,20 @@ export default {
       this.game.add_player(this.new_player_name);
       this.new_player_name = '';
     },
+    close_dialog() {
+      this.new_player_name = '';
+      this.dialog = false;
+    },
     start_round() {
       this.game.start_next_round();
     },
     delete_player(index) {
       this.game.players.splice(index, 1);
+    },
+    onKeyDown(e) {
+      if (e.key === 'Escape') {
+        this.close_dialog()
+      }
     },
   }
 }

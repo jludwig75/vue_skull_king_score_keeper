@@ -4,7 +4,7 @@
       <v-toolbar app dark class="indigo">
         <v-toolbar-title class="headline">
           <span>Skull King Score Keeper</span>
-          <v-dialog v-model="new_game_dialog" width="195">
+          <v-dialog v-model="new_game_dialog" width="433">
             <template v-slot:activator="{ props }">
               <v-btn color="primary" v-bind="props" size="small">New Game</v-btn>
             </template>
