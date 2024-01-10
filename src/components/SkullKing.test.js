@@ -67,9 +67,9 @@ test('Test more advanced game functionality', () => {
 
     
     // Add bonuses
-    player_round_joe.add_bonus(CaptureBonuses.GREEN_14);
-    player_round_mary.add_bonus(CaptureBonuses.YELLOW_14);
-    player_round_sue.add_bonus(CaptureBonuses.BLACK_14);
+    player_round_joe.claim_bonus(CaptureBonuses.GREEN_14);
+    player_round_mary.claim_bonus(CaptureBonuses.YELLOW_14);
+    player_round_sue.claim_bonus(CaptureBonuses.BLACK_14);
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(50);
     expect(player_round_sue.get_score()).toBe(50);
