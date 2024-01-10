@@ -9,9 +9,7 @@
           Bidding</v-btn>
       </span>
       <span v-if="round.state == 2 && round.all_tricks_won_set()">
-        <v-btn color="primary"
-          v-if="round.total_tricks_won() <= round.round_number && round.total_bonuses_claimed() <= round.total_tricks_won()"
-          @click="round.end()" size="small">End
+        <v-btn color="primary" v-if="score_is_valid()" @click="round.end()" size="small">End
           Round</v-btn>
         <v-alert class="multi-line" type="error" v-else>
           {{ end_game_error_message() }}
@@ -76,20 +74,21 @@ export default {
       if (this.round.total_tricks_won() > this.round.round_number) {
         error_message += " - The total number of tricks won for all players (" + this.round.total_tricks_won() + ") is too high for this round (" + this.round.round_number + ")";
       }
-      console.log("Total bonuses claimed: " + this.round.total_bonuses_claimed());
-      console.log("Total tricks won: " + this.round.total_tricks_won());
-      if (this.round.total_bonuses_claimed() > Math.min(this.round.total_tricks_won(), this.round.round_number)) {
+      let number_of_cards_per_trick = this.round.game.players.length;
+      let max_possible_total_bonuses = number_of_cards_per_trick * Math.min(this.round.total_tricks_won(), this.round.round_number);
+      if (this.round.total_bonuses_claimed() > max_possible_total_bonuses) {
         if (error_message.length > 0) {
           error_message += "\n";
         }
-        error_message += " - The total number of bonuses claimed for all players (" + this.round.total_bonuses_claimed() + ") is too high for the number of tricks won or that can be won (" + Math.min(this.round.total_tricks_won(), this.round.round_number) + ")";
+        error_message += " - The total number of bonuses claimed for all players (" + this.round.total_bonuses_claimed() + ") is higher than possible on this round (" + max_possible_total_bonuses + ")";
       }
       for (const player_round of this.round.player_rounds) {
-        if (player_round.bonuses.length > player_round.tricks_won) {
+        let max_possible_player_bonuses = number_of_cards_per_trick * player_round.tricks_won;
+        if (player_round.bonuses.length > max_possible_player_bonuses) {
           if (error_message.length > 0) {
             error_message += "\n";
           }
-          error_message += " - " + player_round.player.name + " has claimed more bonuses (" + player_round.bonuses.length + ") than tricks won (" + player_round.tricks_won + ")";
+          error_message += " - " + player_round.player.name + " has claimed more bonuses (" + player_round.bonuses.length + ") than possible on this round (" + max_possible_player_bonuses + ")";
         }
       }
       if (error_message.length > 0) {
@@ -97,6 +96,21 @@ export default {
       }
       console.log("Set error messages to " + error_message);
       return error_message;
+    },
+    score_is_valid() {
+      var number_of_cards_per_trick = this.round.game.players.length;
+      let max_possible_total_bonuses = number_of_cards_per_trick * Math.min(this.round.total_tricks_won(), this.round.round_number);
+      if (this.round.total_tricks_won() > this.round.round_number || this.round.total_bonuses_claimed() > max_possible_total_bonuses) {
+        return false;
+      }
+      for (const player_round of this.round.player_rounds) {
+        let max_possible_player_bonuses = number_of_cards_per_trick * player_round.tricks_won;
+        if (player_round.bonuses.length > max_possible_player_bonuses) {
+          return false;
+        }
+      }
+
+      return true;
     },
   }
 }
