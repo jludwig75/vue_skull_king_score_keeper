@@ -251,6 +251,10 @@ class Round {
         return this.game.get_round(this.round_number - 1);
     }
 
+    total_bonuses_claimed() {
+        return AllCaptureBonsues.length - this.available_bonuses.length;
+    }
+
     total_tricks_won() {
         let tricks_won = 0;
         for (const player_round of this.player_rounds) {
