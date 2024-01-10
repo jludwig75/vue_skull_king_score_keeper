@@ -166,5 +166,5 @@ test('Test game serialization and deserialization', () => {
     sues_round.add_alliance(alliance);
 
     // Test serialization and desrialization
-    // TODO: This fails: expect(validate_serialization_and_deserialization(game)).toBe(true);
+    expect(validate_serialization_and_deserialization(game)).toBe(true);
 });

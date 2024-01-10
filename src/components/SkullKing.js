@@ -3,7 +3,7 @@ class Player {
         this.name = name;
     }
 
-    static desrialize(player_data) {
+    static deserialize(player_data) {
         return new Player(player_data.name);
     }
 
@@ -29,10 +29,20 @@ class Alliance {
         this.player2 = player2;
     }
 
-    static desrialize(alliance_data, gane) {
+    static deserialize(alliance_json, gane) {
+        let alliance_data = JSON.parse(alliance_json);
+        // console.log('Deserializing alliance: ' + JSON.stringify(alliance_data));
+        let player1 = gane.get_player_by_name(alliance_data.player1_name);
+        if (!player1) {
+            console.error('Could not find player with name ' + alliance_data.player1_name);
+        }
+        let player2 = gane.get_player_by_name(alliance_data.player2_name);
+        if (!player2) {
+            console.error('Could not find player with name ' + alliance_data.player2_name);
+        }
         return new Alliance(
-            gane.get_player_by_name(alliance_data.player1_name),
-            gane.get_player_by_name(alliance_data.player2_name),
+            player1,
+            player2,
         );
     }
 
@@ -113,28 +123,39 @@ class PlayerRound {
         this.tricks_won = null;
     }
 
-    static desrialize(player_round_json, round) {
+    static deserialize(player_round_json, round) {
         let player_round_data = JSON.parse(player_round_json);
         let player = round.game.get_player_by_name(player_round_data.player_name)
         let player_round = new PlayerRound(round, player_round_data.round_number, player);
         player_round.bonuses = player_round_data.bonuses.slice();
         player_round.tricks_bid = player_round_data.tricks_bid;
         player_round.tricks_won = player_round_data.tricks_won;
+        // console.log('Deserializing ' + player.name + '\'s alliances: ' + JSON.stringify(player_round_data.alliances));
         for (const alliance_data of player_round_data.alliances) {
-            player_round.alliances.push(Alliance.desrialize(alliance_data, round.game));
+            // console.log('Deserializing an alliance for ' + player.name + ': ' + JSON.stringify(alliance_data));
+            player_round.alliances.push(Alliance.deserialize(alliance_data, round.game));
         }
+        // console.log('Complete deserialized player_round for ' + player.name + ': ' + player_round.serialize(false));
         return player_round
     }
 
-    serialize() {
-        return JSON.stringify({
+    serialize(print_to_console = true) {
+        let alliances = [];
+        for (const alliance of this.alliances) {
+            alliances.push(alliance.serialize());
+        }
+        let serialized_json = JSON.stringify({
             round_number: this.round_number,
             player_name: this.player.name,
             bonuses: this.bonuses,
-            alliances: this.alliances,
+            alliances: alliances,
             tricks_bid: this.tricks_bid,
             tricks_won: this.tricks_won,
         });
+        // if (print_to_console) {
+        //     console.log('Complete serialized player_round for ' + this.player.name + ': ' + serialized_json);
+        // }
+        return serialized_json;
     }
 
     is_independent_clone_of(other, my_round) {
@@ -148,7 +169,7 @@ class PlayerRound {
             console.error('Nunber of bonuses does not match');
             return false
         }
-        console.log('Comparing ' + number_of_bonuses + ' bonuses. this: ' + JSON.stringify(this.bonuses) + ' other: ' + JSON.stringify(other.bonuses));
+        // console.log('Comparing ' + number_of_bonuses + ' bonuses. this: ' + JSON.stringify(this.bonuses) + ' other: ' + JSON.stringify(other.bonuses));
         for (let i = 0; i < number_of_bonuses; i++) {
             if (!bonuses_are_equal(this.bonuses[i], other.bonuses[i])) {
                 console.error('Bonus does not match. this.bonuses[i]: ' + JSON.stringify(this.bonuses[i]) + ' other: ' + JSON.stringify(other.bonuses[i]));
@@ -157,8 +178,8 @@ class PlayerRound {
         }
 
         // Compare the scores
-        if (this.get_score() != other.get_score()) {
-            console.error('Score does not match');
+        if (this.get_score() !== other.get_score()) {
+            console.error(this.player.name + '\'s score does not match. this.get_score(): ' + this.get_score(), ' other.get_score(): ' + other.get_score());
             return false;
         }
 
@@ -212,11 +233,14 @@ class PlayerRound {
     }
 
     get_score() {
+        // console.log('Calcualting round score for ' + this.player.name);
         if (this.tricks_bid == null || this.tricks_won == null) {
+            // console.warn('Score is null because tricks_bid or tricks_won is null');
             return null;
         }
         let score = 0;
 
+        // console.log('Calcualting tricks score for ' + this.player.name);
         if (this.tricks_won == this.tricks_bid) {
             if (this.tricks_bid == 0) {
                 score += this.round_number * 10;
@@ -226,16 +250,22 @@ class PlayerRound {
         } else {
             score -= Math.abs(this.tricks_won - this.tricks_bid) * 10;
         }
+        // console.log('Tricks score for ' + this.player.name + ': ' + score);
 
         if (this.won_bid()) {
+            // console.log(this.player.name + ' won their tricks bid. Adding bonuses...');
             // Handle bonuses
             for (const bonus of this.bonuses) {
                 score += bonus.points;
             }
+            // console.log('Tricks+bonues score for ' + this.player.name + ': ' + score);
 
+            // console.log('Calculating ' + this.player.name + '\'s alliance score...');
             // Handle alliances
+            // console.log(this.player.name + ' has ' + this.alliances.length + ' alliances');
             for (const alliance of this.alliances) {
                 let other_player = alliance.get_other_player(this.player);
+                // console.log('Evaluating alliance between ' + this.player.name + ' and ' + other_player.name);
                 if (other_player) {
                     let other_player_round = this.round.get_player_round(other_player);
                     if (other_player_round) {
@@ -245,6 +275,7 @@ class PlayerRound {
                     } // else handle error
                 } // else handle error
             }
+            // console.log('Tricks+bonues+alliances score for ' + this.player.name + ': ' + score);
         }
 
         return score;
@@ -294,7 +325,7 @@ class Round {
         this.state = RoundState.NEW;
     }
 
-    static desrialize(round_json, game) {
+    static deserialize(round_json, game) {
         let round_data = JSON.parse(round_json);
         let new_round = new Round(game, round_data.round_number, game.players);
         new_round.state = round_data.state;
@@ -303,9 +334,9 @@ class Round {
         new_round.player_rounds = [];
         let i = 0;
         for (const player_round_data of round_data.player_rounds) {
-            console.log('Deserialzing player_round ' + i);
+            // console.log('Deserialzing player_round ' + i);
             i++;
-            new_round.player_rounds.push(PlayerRound.desrialize(player_round_data, new_round));
+            new_round.player_rounds.push(PlayerRound.deserialize(player_round_data, new_round));
         }
 
         return new_round;
@@ -326,7 +357,7 @@ class Round {
 
     is_independent_clone_of(other, my_game) {
         if (other == null || other == this) {
-            console.error('Null or duplicate round' + other);
+            // console.error('Null or duplicate round' + other);
             return false;
         }
 
@@ -335,7 +366,7 @@ class Round {
             console.error('Number of available bonuses does not match. this.available_bonuses.length: ' + this.available_bonuses.length + ' other.available_bonuses.length: ' + other.available_bonuses.length)
             return false;
         }
-        console.log('Comparing ' + number_of_bonuses + ' available bonuses. this: ' + JSON.stringify(this.available_bonuses) + ' other: ' + JSON.stringify(other.available_bonuses));
+        // console.log('Comparing ' + number_of_bonuses + ' available bonuses. this: ' + JSON.stringify(this.available_bonuses) + ' other: ' + JSON.stringify(other.available_bonuses));
         for (let i = 0; i < number_of_bonuses; i++) {
             if (!bonuses_are_equal(this.available_bonuses[i], other.available_bonuses[i])) {
                 console.error('available_bonuse does not match. this.available_bonuses[i]: ' + this.available_bonuses[i] + ' other.available_bonuses[i]: ' + other.available_bonuses[i])
@@ -345,14 +376,14 @@ class Round {
 
         let number_of_rounds = this.player_rounds.length;
         if (number_of_rounds != other.player_rounds.length) {
-            console.error('Number of player_rounds does not match. this.player_rounds.length: ' + this.player_rounds.length + ' other.player_rounds.length: ' + other.player_rounds.length)
+            // console.error('Number of player_rounds does not match. this.player_rounds.length: ' + this.player_rounds.length + ' other.player_rounds.length: ' + other.player_rounds.length)
             return false
         }
-        console.log('Comparing ' + number_of_rounds + ' player rounds');
+        // console.log('Comparing ' + number_of_rounds + ' player rounds');
         for (let i = 0; i < number_of_rounds; i++) {
-            console.log('Comparing player_round ' + i + '. this: ' + this.player_rounds[i].serialize() + ' other: ' + other.player_rounds[i].serialize());
+            // console.log('Comparing player_round ' + i + '. this: ' + this.player_rounds[i].serialize(false) + ' other: ' + other.player_rounds[i].serialize(false));
             if (!(this.player_rounds[i].is_independent_clone_of(other.player_rounds[i], this))) {
-                console.error('player_rounds do not match. this.player_rounds[i]: ' + this.player_rounds[i].serialize() + ' other.player_rounds[i]: ' + other.player_rounds[i].serialize())
+                console.error('player_rounds do not match. this.player_rounds[i]: ' + this.player_rounds[i].serialize(false) + ' other.player_rounds[i]: ' + other.player_rounds[i].serialize(false))
                 return false;
             }
         }
@@ -477,23 +508,25 @@ class Game {
         // Deserialize players first so other objects
         // can look up layers by name.
         for (const player_data of game_data.players) {
-            game.players.push(Player.desrialize(player_data));
+            game.players.push(Player.deserialize(player_data));
         }
 
         for (const round_data of game_data.rounds) {
-            game.rounds.push(Round.desrialize(round_data, game));
+            game.rounds.push(Round.deserialize(round_data, game));
         }
 
         return game;
     }
 
     serialize() {
+        // console.log('BEGIN SERIALIZE GAME');
         let serialized_rounds = [];
         for (const round of this.rounds) {
             serialized_rounds.push(round.serialize());
         }
         let game_data = { players: this.players, rounds: serialized_rounds };
 
+        // console.log('END SERIALIZE GAME');
         return JSON.stringify(game_data);
     }
 
@@ -507,7 +540,7 @@ class Game {
             return false;
         }
         for (let i = 0; i < number_of_players; i++) {
-            console.log('Comparing players. this: ' + this.players[i].serialize() + ' other: ' + other.players[i].serialize());
+            // console.log('Comparing players. this: ' + this.players[i].serialize(false) + ' other: ' + other.players[i].serialize(false));
             if (!this.players[i].is_independent_clone_of(other.players[i], this)) {
                 return false;
             }
@@ -518,10 +551,10 @@ class Game {
             return false;
         }
         for (let i = 0; i < number_of_rounds; i++) {
-            console.log('Comparing round ' + i);
+            // console.log('Comparing round ' + i);
             if (!this.rounds[i].is_independent_clone_of(other.rounds[i], this)) {
                 console.error(
-                    'Games rounds do not match. this: ' + this.rounds[i].serialize() + ' other: ' + other.rounds[i].serialize()
+                    'Games rounds do not match. this: ' + this.rounds[i].serialize(false) + ' other: ' + other.rounds[i].serialize(false)
                 );
                 return false;
             }
