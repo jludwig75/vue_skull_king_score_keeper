@@ -98,13 +98,22 @@ export default {
       return error_message;
     },
     score_is_valid() {
+      console.log("this.round: " + this.round);
+      console.log("this.round.game: " + this.round.game);
+      console.log("this.round.game.players: " + this.round.game.players);
+      console.log("this.round.game.players.length: " + this.round.game.players.length);
       var number_of_cards_per_trick = this.round.game.players.length;
+      console.log("number_of_cards_per_trick: " + number_of_cards_per_trick);
       let max_possible_total_bonuses = number_of_cards_per_trick * Math.min(this.round.total_tricks_won(), this.round.round_number);
       if (this.round.total_tricks_won() > this.round.round_number || this.round.total_bonuses_claimed() > max_possible_total_bonuses) {
         return false;
       }
       for (const player_round of this.round.player_rounds) {
         let max_possible_player_bonuses = number_of_cards_per_trick * player_round.tricks_won;
+        console.log("number_of_cards_per_trick: " + number_of_cards_per_trick);
+        console.log(player_round.player.name + ": player_round.tricks_won: " + player_round.tricks_won);
+        console.log(player_round.player.name + ": max_possible_player_bonuses: " + max_possible_player_bonuses);
+        console.log(player_round.player.name + ": player_round.bonuses.length: " + player_round.bonuses.length);
         if (player_round.bonuses.length > max_possible_player_bonuses) {
           return false;
         }
