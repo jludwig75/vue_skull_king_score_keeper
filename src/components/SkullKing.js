@@ -139,7 +139,7 @@ class PlayerRound {
         return player_round
     }
 
-    serialize(print_to_console = true) {
+    serialize(/*print_to_console = true*/) {
         let alliances = [];
         for (const alliance of this.alliances) {
             alliances.push(alliance.serialize());
@@ -332,10 +332,10 @@ class Round {
         new_round.available_bonuses = round_data.available_bonuses;
         // This array was initialized by the constructor. Clear it now.
         new_round.player_rounds = [];
-        let i = 0;
+        // let i = 0;
         for (const player_round_data of round_data.player_rounds) {
             // console.log('Deserialzing player_round ' + i);
-            i++;
+            // i++;
             new_round.player_rounds.push(PlayerRound.deserialize(player_round_data, new_round));
         }
 
