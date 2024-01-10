@@ -23,7 +23,7 @@
         :round_state="round_state" />
     </v-card-text>
   </v-card>
-  <v-dialog v-model="show_yo_ho_ho" width="200">
+  <v-dialog v-model="show_yo_ho_ho" width="195">
     <v-card>
       <v-card-title>
         Starting Round {{ round.round_number }}
@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     on_click_start_round() {
-
+      this.yo_ho_ho_message = "Get ready to start round " + this.round.round_number + "!";
       this.show_yo_ho_ho = true;
       setTimeout(() => {
         this.yo_ho_ho_message = 'Yo... '
