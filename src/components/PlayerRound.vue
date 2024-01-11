@@ -67,15 +67,15 @@
             <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
               <h3>Available Bonsues</h3>
               <v-chip-group>
-                <v-chip v-for="capture_bonus in player_round.round.available_bonuses" :key="capture_bonus"
-                  @click="claim_bonus(capture_bonus)">{{ capture_bonus.name }}</v-chip>
+                <v-chip v-for="capture_bonus in available_capture_bonuses()" :key="capture_bonus"
+                  @click="claim_bonus(capture_bonus)">{{ capture_bonus.name }} ( {{ capture_bonus.count }})</v-chip>
               </v-chip-group>
             </span>
             <span v-if="player_round.round.state >= 2">
               <h3>Captured Bonsues</h3>
               <v-chip-group>
-                <v-chip v-for="capture_bonus in player_round.bonuses" :key="capture_bonus"
-                  :closable="player_round.round.state == 2" @click:close="remove_bonus(capture_bonus)">{{
+                <v-chip v-for="(capture_bonus, index) in player_round.bonuses" :key="capture_bonus"
+                  :closable="player_round.round.state == 2" @click:close="remove_bonus(capture_bonus, index)">{{
                     capture_bonus.name }} (+{{ capture_bonus.points }} points)</v-chip>
               </v-chip-group>
             </span>
@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { AllCaptureBonsues, Alliance } from './SkullKing.js'
+import { Alliance } from './SkullKing.js'
 
 export default {
   name: 'PlayerRound',
@@ -174,13 +174,19 @@ export default {
       this.won_dialog = false;
     },
     available_capture_bonuses() {
-      return AllCaptureBonsues;
+      let available_bonuses = [];
+      for (const available_bonus of this.player_round.round.available_bonuses) {
+        if (available_bonus.count > 0) {
+          available_bonuses.push(available_bonus);
+        }
+      }
+      return available_bonuses;
     },
     claim_bonus(bonus) {
       this.player_round.claim_bonus(bonus);
     },
-    remove_bonus(bonus) {
-      this.player_round.relinquish_bonus(bonus);
+    remove_bonus(bonus, index) {
+      this.player_round.relinquish_bonus(bonus, index);
     },
     get_other_players() {
       let players = this.player_round.round.game.players.slice();

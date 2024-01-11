@@ -69,17 +69,14 @@ export default {
     };
   },
   mounted() {
-    console.log('Disabling game save');
-    this.disable_game_save = true;
-    // localStorage.removeItem('game');
     let game_json = localStorage.getItem('game');
     if (game_json) {
       console.log('Found save game. Attempting to deserialize "' + game_json + '""');
+      this.disable_game_save = true;
       this.game = Game.deserialize(game_json);
+      this.disable_game_save = false;
       console.log('Successfully deserialized saved game');
     }
-    console.log('Enabling game save');
-    this.disable_game_save = false;
     window.addEventListener('keydown', this.onKeyDown);
   },
   beforeUnmount() {

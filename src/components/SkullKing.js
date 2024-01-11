@@ -100,13 +100,13 @@ class Alliance {
 
 
 const CaptureBonuses = {
-    GREEN_14: { name: 'Green 14', points: 10 },
-    YELLOW_14: { name: 'Yellow 14', points: 10 },
-    PURPLE_14: { name: 'Purple 14', points: 10 },
-    BLACK_14: { name: 'Black 14', points: 20 },
-    SKULL_KING: { name: 'Skull King', points: 20 },
-    PIRATE: { name: 'Pirate', points: 20 },
-    MERMAID: { name: 'Mermaid', points: 20 }
+    GREEN_14: { name: 'Green 14', points: 10, count: 1 },
+    YELLOW_14: { name: 'Yellow 14', points: 10, count: 1 },
+    PURPLE_14: { name: 'Purple 14', points: 10, count: 1 },
+    BLACK_14: { name: 'Black 14', points: 20, count: 1 },
+    SKULL_KING: { name: 'Skull King', points: 20, count: 1 },
+    PIRATE: { name: 'Pirate', points: 20, count: 6 },
+    MERMAID: { name: 'Mermaid', points: 20, count: 2 }
 }
 
 function bonuses_are_equal(bonus1, bonus2) {
@@ -116,12 +116,35 @@ function bonuses_are_equal(bonus1, bonus2) {
 
 const AllCaptureBonsues = [CaptureBonuses.GREEN_14, CaptureBonuses.YELLOW_14, CaptureBonuses.PURPLE_14, CaptureBonuses.BLACK_14, CaptureBonuses.SKULL_KING, CaptureBonuses.MERMAID, CaptureBonuses.PIRATE]
 
+class CapturedBonus {
+    constructor(bonus) {
+        this.name = bonus.name;
+        this.points = bonus.points;
+    }
+
+    static deserialize(json) {
+        // console.log('Deserializing CapturedBons JSON ' + json);
+        let data = JSON.parse(json);
+        return new AvailableBonus(data);
+    }
+
+    serialize() {
+        return JSON.stringify(this);
+    }
+
+    matches(other) {
+        // console.log('CapturedBonus comparing ' + JSON.stringify(this) + ' to ' + JSON.stringify(other));
+        return this.name === other.name && this.points === other.points;
+    }
+}
+
+
 class PlayerRound {
     constructor(round, round_number, player) {
         this.round = round;
         this.round_number = round_number
         this.player = player;
-        this.bonuses = []
+        this.bonuses = [];
         this.alliances = [];
         this.tricks_bid = null;
         this.tricks_won = null;
@@ -131,7 +154,6 @@ class PlayerRound {
         let player_round_data = JSON.parse(player_round_json);
         let player = round.game.get_player_by_name(player_round_data.player_name)
         let player_round = new PlayerRound(round, player_round_data.round_number, player);
-        player_round.bonuses = player_round_data.bonuses.slice();
         player_round.tricks_bid = player_round_data.tricks_bid;
         player_round.tricks_won = player_round_data.tricks_won;
         // console.log('Deserializing ' + player.name + '\'s alliances: ' + JSON.stringify(player_round_data.alliances));
@@ -139,6 +161,10 @@ class PlayerRound {
             // console.log('Deserializing an alliance for ' + player.name + ': ' + JSON.stringify(alliance_data));
             player_round.alliances.push(Alliance.deserialize(alliance_data, round.game));
         }
+        for (const bonus of player_round_data.bonuses) {
+            player_round.bonuses.push(CapturedBonus.deserialize(bonus));
+        }
+        // console.log('this.available_bonuses: ' + JSON.stringify(this.available_bonuses));
         // console.log('Complete deserialized player_round for ' + player.name + ': ' + player_round.serialize(false));
         return player_round
     }
@@ -148,10 +174,14 @@ class PlayerRound {
         for (const alliance of this.alliances) {
             alliances.push(alliance.serialize());
         }
+        let captured_bonuses = [];
+        for (const captured_bonus of this.bonuses) {
+            captured_bonuses.push(captured_bonus.serialize());
+        }
         let serialized_json = JSON.stringify({
             round_number: this.round_number,
             player_name: this.player.name,
-            bonuses: this.bonuses,
+            bonuses: captured_bonuses,
             alliances: alliances,
             tricks_bid: this.tricks_bid,
             tricks_won: this.tricks_won,
@@ -262,15 +292,27 @@ class PlayerRound {
     claim_bonus(bonus) {
         let bonus_to_claim = this.round.claim_bonus(bonus);
         if (bonus_to_claim) {
-            this.bonuses.push(bonus_to_claim);
+            this.bonuses.push(new CapturedBonus(bonus_to_claim));
         } // else handle error
     }
 
-    relinquish_bonus(bonus) {
-        let bonus_index = this.bonuses.indexOf(bonus);
+    relinquish_bonus(bonus, index = null) {
+        // console.log('relinquish_bonus(' + JSON.stringify(bonus) + ',' + index + ')')
+        var bonus_index = null;
+        if (index == null) {
+            bonus_index = this.bonuses.findIndex(found_bonus => found_bonus.name === bonus.name);
+        } else {
+            if (index >= this.bonuses.length || !bonus.matches(this.bonuses[index])) {
+                console.error("Bonus at index does not match");
+                return;
+            }
+            bonus_index = index;
+        }
         if (bonus_index != -1) {
+            // console.log("Removing bonus at index " + bonus_index);
             this.bonuses.splice(bonus_index, 1);
             this.round.return_bonus(bonus);
+            // console.log('Bonuses after relinquish ' + JSON.stringify(this.bonuses));
         } // else handle error
     }
 
@@ -356,6 +398,28 @@ class PlayerRound {
     }
 }
 
+class AvailableBonus {
+    constructor(bonus) {
+        this.name = bonus.name;
+        this.points = bonus.points;
+        this.count = bonus.count;
+    }
+
+    static deserialize(json) {
+        let data = JSON.parse(json);
+        return new AvailableBonus(data);
+    }
+
+    serialize() {
+        return JSON.stringify(this);
+    }
+
+    matches(other) {
+        // console.log('AvailableBonus comparing ' + JSON.stringify(this) + ' to ' + JSON.stringify(other));
+        return this.name === other.name && this.points === other.points;
+    }
+}
+
 const RoundState = {
     NEW: 0,
     BIDDING: 1,
@@ -371,7 +435,8 @@ class Round {
         for (const player of players) {
             this.player_rounds.push(new PlayerRound(this, round_number, player));
         }
-        this.available_bonuses = AllCaptureBonsues.slice();
+        this.available_bonuses = AllCaptureBonsues.map(bonus => new AvailableBonus(bonus));
+        // console.log('this.available_bonuses: ' + JSON.stringify(this.available_bonuses));
         this.state = RoundState.NEW;
     }
 
@@ -379,7 +444,13 @@ class Round {
         let round_data = JSON.parse(round_json);
         let new_round = new Round(game, round_data.round_number, game.players);
         new_round.state = round_data.state;
-        new_round.available_bonuses = round_data.available_bonuses;
+
+        // This array was initialized by the constructor. Clear it now.
+        new_round.available_bonuses = [];
+        for (const available_bonus_data of round_data.available_bonuses) {
+            new_round.available_bonuses.push(AvailableBonus.deserialize(available_bonus_data));
+        }
+
         // This array was initialized by the constructor. Clear it now.
         new_round.player_rounds = [];
         // let i = 0;
@@ -397,10 +468,14 @@ class Round {
         for (const player_round of this.player_rounds) {
             player_rounds.push(player_round.serialize())
         }
+        let available_bonuses = [];
+        for (const available_bonus of this.available_bonuses) {
+            available_bonuses.push(available_bonus.serialize());
+        }
         return JSON.stringify({
             round_number: this.round_number,
             player_rounds: player_rounds,
-            available_bonuses: this.available_bonuses,
+            available_bonuses: available_bonuses,
             state: this.state,
         });
     }
@@ -487,22 +562,30 @@ class Round {
 
     claim_bonus(bonus) {
         // See if the bonus is available
-        if (this.available_bonuses.includes(bonus)) {
-            let bonus_index = this.available_bonuses.indexOf(bonus);
-            if (bonus_index !== -1) {
-                // Remove the bonus from the available bonus list
-                this.available_bonuses.splice(bonus_index, 1);
-                return bonus;
-            } // else handle error
+        // console.log('Attempting to claim bonus ' + JSON.stringify(bonus) + ' from ' + JSON.stringify(this.available_bonuses))
+        let bonus_index = this.available_bonuses.findIndex(found_bonus => found_bonus.matches(bonus));
+        if (bonus_index === -1) {
+            console.warn('Unexpectedly count not find available bonus');
+            return null;
         }
-
-        return null;
+        if (this.available_bonuses[bonus_index].count == 0) {
+            console.warn('Cannot claim bonus that is no longer available');
+            return null;
+        }
+        // Decrement the available bonus count
+        this.available_bonuses[bonus_index].count--;
+        return bonus;
     }
 
     return_bonus(bonus) {
-        if (!this.available_bonuses.includes(bonus)) {
-            this.available_bonuses.push(bonus);
-        } // else handle error
+        // See if the bonus is available
+        // console.log('Attempting to return bonus ' + JSON.stringify(bonus) + ' from ' + JSON.stringify(this.available_bonuses))
+        let bonus_index = this.available_bonuses.findIndex(found_bonus => found_bonus.matches(bonus));
+        if (bonus_index === -1) {
+            console.warn('Unexpectedly count not find available bonus');
+            return null;
+        }
+        this.available_bonuses[bonus_index].count++;
     }
 
     get_player_round(player) {

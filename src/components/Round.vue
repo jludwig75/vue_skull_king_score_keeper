@@ -83,7 +83,7 @@ export default {
         error_message += " - The total number of bonuses claimed for all players (" + this.round.total_bonuses_claimed() + ") is higher than possible on this round (" + max_possible_total_bonuses + ")";
       }
       for (const player_round of this.round.player_rounds) {
-        let max_possible_player_bonuses = number_of_cards_per_trick * player_round.tricks_won;
+        let max_possible_player_bonuses = (number_of_cards_per_trick - 1) * player_round.tricks_won;
         if (player_round.bonuses.length > max_possible_player_bonuses) {
           if (error_message.length > 0) {
             error_message += "\n";
@@ -109,8 +109,8 @@ export default {
         return false;
       }
       for (const player_round of this.round.player_rounds) {
-        let max_possible_player_bonuses = number_of_cards_per_trick * player_round.tricks_won;
-        console.log("number_of_cards_per_trick: " + number_of_cards_per_trick);
+        let max_possible_player_bonuses = (number_of_cards_per_trick - 1) * player_round.tricks_won;
+        console.log("max_possible_player_bonuses: " + max_possible_player_bonuses);
         console.log(player_round.player.name + ": player_round.tricks_won: " + player_round.tricks_won);
         console.log(player_round.player.name + ": max_possible_player_bonuses: " + max_possible_player_bonuses);
         console.log(player_round.player.name + ": player_round.bonuses.length: " + player_round.bonuses.length);

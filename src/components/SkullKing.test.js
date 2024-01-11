@@ -153,7 +153,7 @@ test('Test game serialization and deserialization', () => {
     expect(validate_serialization_and_deserialization(game)).toBe(true);
 
     // Claim bonuses
-    sues_round.claim_bonus(CaptureBonuses.BLACk_14);
+    sues_round.claim_bonus(CaptureBonuses.BLACK_14);
     sues_round.claim_bonus(CaptureBonuses.YELLOW_14);
 
     // Test serialization and desrialization
