@@ -37,7 +37,7 @@
       </v-dialog>
     </v-card-text>
   </v-card>
-  <Round v-for="round in game.rounds" :key="round" :round="round" />
+  <Round v-for="round in game.rounds" :key="round" :round="round" @endRound="on_round_complete()" />
   <v-card v-if="game.can_start_new_round()">
     <v-card-text>
       <v-btn color="primary" v-if="game.can_start_new_round()" @click="start_round()">
@@ -124,6 +124,9 @@ export default {
       if (e.key === 'Escape') {
         this.close_dialog()
       }
+    },
+    on_round_complete() {
+      this.game.start_next_round();
     },
   }
 }

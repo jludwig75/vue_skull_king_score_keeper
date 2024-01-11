@@ -9,7 +9,7 @@
           Bidding</v-btn>
       </span>
       <span v-if="round.state == 2 && round.all_tricks_won_set()">
-        <v-btn color="primary" v-if="score_is_valid()" @click="round.end()" size="small">End
+        <v-btn color="primary" v-if="score_is_valid()" @click="end_round()" size="small">End
           Round</v-btn>
         <v-alert class="multi-line" type="error" v-else>
           {{ end_game_error_message() }}
@@ -121,6 +121,10 @@ export default {
 
       return true;
     },
+    end_round() {
+      this.round.end();
+      this.$emit('endRound');
+    }
   }
 }
 </script>
