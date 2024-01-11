@@ -77,7 +77,6 @@ test('Test more advanced game functionality', () => {
     // Add an alliance
     let alliance = new Alliance(player_mary, player_sue);
     player_round_sue.add_alliance(alliance);
-    player_round_mary.add_alliance(alliance);
 
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(70);
@@ -162,7 +161,6 @@ test('Test game serialization and deserialization', () => {
 
     // Add alliances
     let alliance = new Alliance(mary, sue);
-    marys_round.add_alliance(alliance);
     sues_round.add_alliance(alliance);
 
     // Test serialization and desrialization

@@ -82,6 +82,10 @@ class Alliance {
         return true;
     }
 
+    matches(other) {
+        return this.player1 == other.player1 && this.player2 == other.player2;
+    }
+
     get_other_player(this_player) {
         if (this_player == this.player1) {
             return this.player2;
@@ -207,6 +211,52 @@ class PlayerRound {
 
     add_alliance(alliance) {
         this.alliances.push(alliance);
+        let remove_alliance = () => {
+            let index = this.alliances.indexOf(alliance);
+            if (index != -1) {
+                this.alliances.splice(index, 1);
+            }
+        };
+
+        let other_player = alliance.get_other_player(this.player);
+        if (!other_player) {
+            console.error('Failed to get other player');
+            remove_alliance();
+            return false;
+        }
+        let other_player_round = this.round.get_player_round(other_player);
+        if (!other_player_round) {
+            console.error('Failed to get other player round');
+            remove_alliance();
+            return false;
+        }
+
+        other_player_round.alliances.push(alliance);
+        return true;
+    }
+
+    remove_alliance(alliance) {
+        let alliance_index = this.alliances.indexOf(alliance);
+        if (alliance_index == -1) {
+            return false;
+        }
+        this.alliances.splice(alliance_index, 1);
+
+        let other_player = alliance.get_other_player(this.player);
+        if (!other_player) {
+            console.error('Failed to get other player');
+            return false;
+        }
+        let other_player_round = this.round.get_player_round(other_player);
+        if (!other_player_round) {
+            console.error('Failed to get other player round');
+            return false;
+        }
+
+        alliance_index = other_player_round.alliances.findIndex((found_alliance) => alliance.matches(found_alliance));
+        if (alliance_index != -1) {
+            other_player_round.alliances.splice(alliance_index, 1);
+        }
     }
 
     claim_bonus(bonus) {
