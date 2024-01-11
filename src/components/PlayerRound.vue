@@ -80,7 +80,7 @@
               </v-chip-group>
             </span>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="3" v-if="!player_round.round.is_current_round() || player_round.round.state >= 2">
             <h3>Alliances</h3>
             <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
               <v-dialog v-model="alliance_dialog" width="400">
@@ -224,9 +224,11 @@ export default {
 
 .clickable-icon {
   cursor: pointer;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+  padding-top: 0.6em;
+  padding-bottom: 0.6em;
+  margin-left: 0.4em;
+  margin-right: 0.4em;
 }
 </style>
