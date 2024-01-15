@@ -658,9 +658,7 @@ class Game {
 
     static deserialize(data_json) {
         let game_data = JSON.parse(data_json);
-        let game = new Game();
-
-        game.number_of_rounds = game_data.number_of_rounds;
+        let game = new Game(game_data.number_of_rounds);
 
         // Deserialize players first so other objects
         // can look up layers by name.
