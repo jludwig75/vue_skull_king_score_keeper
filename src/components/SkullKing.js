@@ -1,4 +1,4 @@
-const DEFAULT_NUM_ROUNDS = 2;
+const DEFAULT_NUM_ROUNDS = 10;
 
 class Player {
     constructor(name) {
@@ -660,6 +660,8 @@ class Game {
         let game_data = JSON.parse(data_json);
         let game = new Game();
 
+        game.number_of_rounds = game_data.number_of_rounds;
+
         // Deserialize players first so other objects
         // can look up layers by name.
         for (const player_data of game_data.players) {
@@ -679,7 +681,7 @@ class Game {
         for (const round of this.rounds) {
             serialized_rounds.push(round.serialize());
         }
-        let game_data = { players: this.players, rounds: serialized_rounds };
+        let game_data = { players: this.players, rounds: serialized_rounds, number_of_rounds: this.number_of_rounds };
 
         // console.log('END SERIALIZE GAME');
         return JSON.stringify(game_data);
