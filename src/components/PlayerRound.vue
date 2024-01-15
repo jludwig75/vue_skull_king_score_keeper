@@ -7,10 +7,12 @@
       </v-row>
     </v-card-title>
     <v-card-text class="px-0 pb-1">
-      <v-row class="pa-0 ma-0">
+      <v-row class="pa-0 ma-0" v-if="player_round.round.state > 0">
         <v-col cols="3" class="pa-0 ma-0 px-1">
           <h4>Tricks</h4>
-          <v-list class="py-0">
+          <v-list
+            v-if="player_round.round.is_current_round() && player_round.round.state != 3 && player_round.round.state != 0"
+            class="py-0">
             <v-list-item class="px-2">
               <span v-if="player_round.tricks_bid != null"><b>Bid:</b> {{
                 player_round.tricks_bid
@@ -70,6 +72,11 @@
               </span>
             </v-list-item>
           </v-list>
+          <span v-else>
+            <span v-if="player_round.round.state > 2">
+              {{ player_round.tricks_won }} / {{ player_round.tricks_bid }}
+            </span>
+          </span>
         </v-col>
         <v-col cols="4" class="pa-0 ma-0">
           <span>
@@ -86,9 +93,9 @@
                 <v-card-text>
                   <v-chip-group>
                     <v-chip v-for="bonus in available_capture_bonuses()" :key="bonus" @click="claim_bonus(bonus)"
-                      size="small" :class="bonus_class(bonus)"><v-icon
-                        v-if="bonus_icon(bonus)">{{ bonus_icon(bonus) }}</v-icon><span v-else>{{
-                          bonus_text(bonus) }}</span> ( {{ bonus.count
+                      size="small" :class="bonus_class(bonus)"><v-icon v-if="bonus_icon(bonus)">{{ bonus_icon(bonus)
+                      }}</v-icon><span v-else>{{
+  bonus_text(bonus) }}</span> ( {{ bonus.count
   }})</v-chip>
                   </v-chip-group>
                 </v-card-text>
@@ -111,7 +118,7 @@
             </v-chip-group>
           </span>
         </v-col>
-        <v-col cols="5" v-if="!player_round.round.is_current_round() || player_round.round.state >= 2" class="pa-0 ma-0">
+        <v-col class="pa-0 ma-0">
           <h4>Alliances</h4>
           <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
             <v-dialog v-model="alliance_dialog" width="400">
@@ -140,7 +147,7 @@
             <v-chip-group>
               <v-chip v-for="alliance in player_round.alliances" :key="alliance" size="small">
                 <v-icon class="mr-2" v-if="player_round.round.is_current_round() && player_round.round.state == 2" left
-                  @click="remove_alliance(alliance)">mdi-close-circle</v-icon>{{ alliance.player1.name + ' <-> ' +
+                  @click="remove_alliance(alliance)">mdi-close-circle</v-icon>{{ alliance.player1.name + ' + ' +
                     alliance.player2.name }}
               </v-chip>
             </v-chip-group>

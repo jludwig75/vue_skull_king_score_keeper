@@ -57,8 +57,9 @@
     </v-card-text>
   </v-card>
   <GameResults v-if="game.is_complete()" :results="game.results"></GameResults>
-  <v-dialog v-model="game_complete" width="600">
+  <v-dialog v-model="game_results_dialog" width="600">
     <GameResults v-if="game.is_complete()" :results="game.results"></GameResults>
+    <v-btn @click="game_results_dialog = false">Close</v-btn>
   </v-dialog>
 </template>
 
@@ -82,8 +83,8 @@ export default {
       dialog: false,
       new_player_name: '',
       disable_game_save: false,
-      game_complete: false,
       number_of_rounds: 10,
+      game_results_dialog: false,
     };
   },
   mounted() {
@@ -130,8 +131,10 @@ export default {
       this.new_player_name = '';
     },
     close_dialog() {
-      this.new_player_name = '';
-      this.dialog = false;
+      if (this.dialog) {
+        this.new_player_name = '';
+        this.dialog = false;
+      }
     },
     start_round() {
       if (this.game.rounds.length == 0) {
@@ -147,10 +150,13 @@ export default {
       if (e.key === 'Escape') {
         this.close_dialog()
       }
+      if (this.game_results_dialog && e.key === 'Escape') {
+        this.game_results_dialog = false;
+      }
     },
     on_round_complete() {
       if (this.game.is_complete()) {
-        this.game_complete = true;
+        this.game_results_dialog = true;
       } else {
         this.game.start_next_round();
       }
