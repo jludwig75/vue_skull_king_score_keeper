@@ -1,3 +1,5 @@
+const DEFAULT_NUM_ROUNDS = 2;
+
 class Player {
     constructor(name) {
         this.name = name;
@@ -628,10 +630,30 @@ class Round {
     }
 }
 
-class Game {
+class PlayerScore {
+    constructor(player, score) {
+        this.player = player;
+        this.score = score;
+    }
+}
+
+class GameResults {
     constructor() {
+        this.results = [];
+    }
+
+    add_player_score(player, score) {
+        this.results.push(new PlayerScore(player, score));
+        this.results.sort((a, b) => b.score - a.score);
+    }
+}
+
+class Game {
+    constructor(number_of_rounds = DEFAULT_NUM_ROUNDS) {
         this.players = [];
         this.rounds = [];
+        this.number_of_rounds = number_of_rounds;
+        this.results = null;
     }
 
     static deserialize(data_json) {
@@ -705,7 +727,7 @@ class Game {
     }
 
     start_next_round() {
-        if (this.rounds.length >= 10) {
+        if (this.rounds.length >= this.number_of_rounds) {
             return null;
         }
 
@@ -744,7 +766,7 @@ class Game {
         if (this.players.length < 2) {
             return false;
         }
-        if (this.rounds.length == 10) {
+        if (this.rounds.length == this.number_of_rounds) {
             return false;
         }
         if (this.rounds.length == 0) {
@@ -756,6 +778,29 @@ class Game {
             } // else handle error
         }
         return false;
+    }
+
+    is_complete() {
+        let complete = this.rounds.length == this.number_of_rounds && this.get_current_round().state == RoundState.COMPLETE;
+        if (complete && this.results == null) {
+            console.log('Game complete, but not results. Getting results');
+            this.results = this.get_results();
+            console.log('Game results: ' + this.results);
+        }
+        return complete;
+    }
+
+    get_results() {
+        let results = new GameResults();
+        for (const player_round of this.get_current_round().player_rounds) {
+            results.add_player_score(player_round.player, player_round.get_cumulative_score());
+        }
+
+        for (let i = 0; i < results.results.length; ++i) {
+            results.results[i].place = i + 1;
+        }
+
+        return results;
     }
 }
 

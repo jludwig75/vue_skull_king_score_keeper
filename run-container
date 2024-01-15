@@ -1,4 +1,4 @@
 #!/bin/sh
 
 ./build-image
-docker compose run --rm --publish 8080:8080 skull_king_score_keeper /bin/bash
+docker compose run --rm --publish 0.0.0.0:8080:8080 skull_king_score_keeper /bin/bash

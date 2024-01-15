@@ -32,7 +32,7 @@ test('Test basic game functionality', () => {
 });
 
 test('Test more advanced game functionality', () => {
-    let game = new Game();
+    let game = new Game(3);
     game.add_player("Joe");
     game.add_player("Mary");
     game.add_player("Sue");
@@ -50,10 +50,14 @@ test('Test more advanced game functionality', () => {
     player_round_mary = round.get_player_round(player_mary);
     player_round_sue = round.get_player_round(player_sue);
 
+    round.start();
+
     // Set tricks bid
     player_round_joe.set_tricks_bid(2);
     player_round_mary.set_tricks_bid(2);
     player_round_sue.set_tricks_bid(0);
+
+    round.start_playing();
 
     // Set tricks won
     player_round_joe.set_tricks_won(1);
@@ -70,17 +74,35 @@ test('Test more advanced game functionality', () => {
     player_round_joe.claim_bonus(CaptureBonuses.GREEN_14);
     player_round_mary.claim_bonus(CaptureBonuses.YELLOW_14);
     player_round_sue.claim_bonus(CaptureBonuses.BLACK_14);
+    player_round_sue.claim_bonus(CaptureBonuses.PURPLE_14);
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(50);
-    expect(player_round_sue.get_score()).toBe(50);
+    expect(player_round_sue.get_score()).toBe(60);
 
     // Add an alliance
     let alliance = new Alliance(player_mary, player_sue);
     player_round_sue.add_alliance(alliance);
 
+    round.end();
+
     expect(player_round_joe.get_score()).toBe(-10);
     expect(player_round_mary.get_score()).toBe(70);
-    expect(player_round_sue.get_score()).toBe(70);
+    expect(player_round_sue.get_score()).toBe(80);
+
+    expect(player_round_joe.get_cumulative_score()).toBe(-10);
+    expect(player_round_mary.get_cumulative_score()).toBe(70);
+    expect(player_round_sue.get_cumulative_score()).toBe(80);
+
+    expect(game.is_complete()).toBe(true);
+
+    let results = game.get_results();
+    expect(results.results.length).toBe(3);
+    expect(results.results[0].player.name).toBe('Sue');
+    expect(results.results[0].score).toBe(80);
+    expect(results.results[1].player.name).toBe('Mary');
+    expect(results.results[1].score).toBe(70);
+    expect(results.results[2].player.name).toBe('Joe');
+    expect(results.results[2].score).toBe(-10);
 });
 
 function validate_serialization_and_deserialization(game) {

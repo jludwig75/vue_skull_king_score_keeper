@@ -1,5 +1,4 @@
 <template>
-  <v-container>
     <v-app>
       <v-toolbar app dark class="indigo">
         <v-toolbar-title class="headline">
@@ -30,7 +29,6 @@
         <Game :create_new_game="create_new_game" />
       </v-main>
     </v-app>
-  </v-container>
 </template>
 
 <script>

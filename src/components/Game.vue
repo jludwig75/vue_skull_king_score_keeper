@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="game.rounds.length == 0">
     <v-card-title>
       Players
     </v-card-title>
@@ -37,6 +37,17 @@
       </v-dialog>
     </v-card-text>
   </v-card>
+  <v-card v-if="game.rounds.length == 0">
+    <v-card-title>
+      Game Settings
+    </v-card-title>
+    <v-card-text>
+      <b>Number of Rounds:</b> {{ game.number_of_rounds }}
+      <v-slider v-model="game.number_of_rounds" :min="1" :max="10" :step="1" thumb-label show-ticks="always"
+        tick-size="1">
+      </v-slider>
+    </v-card-text>
+  </v-card>
   <Round v-for="round in game.rounds" :key="round" :round="round" @endRound="on_round_complete()" />
   <v-card v-if="game.can_start_new_round()">
     <v-card-text>
@@ -46,10 +57,15 @@
       </v-btn>
     </v-card-text>
   </v-card>
+  <GameResults v-if="game.is_complete()" :results="game.results"></GameResults>
+  <v-dialog v-model="game_complete" width="600">
+    <GameResults v-if="game.is_complete()" :results="game.results"></GameResults>
+  </v-dialog>
 </template>
 
 <script>
 import { Game } from './SkullKing.js'
+import GameResults from './GameResults.vue'
 import Round from './Round.vue'
 
 export default {
@@ -58,7 +74,8 @@ export default {
     create_new_game: Number,
   },
   components: {
-    Round
+    Round,
+    GameResults
   },
   data() {
     return {
@@ -66,6 +83,7 @@ export default {
       dialog: false,
       new_player_name: '',
       disable_game_save: false,
+      game_complete: false,
     };
   },
   mounted() {
@@ -126,8 +144,24 @@ export default {
       }
     },
     on_round_complete() {
-      this.game.start_next_round();
+      if (this.game.is_complete()) {
+        this.game_complete = true;
+      } else {
+        this.game.start_next_round();
+      }
     },
+    place_string(place) {
+      if (place % 10 === 1) {
+        return place + 'st';
+      }
+      if (place % 10 === 2) {
+        return place + 'nd';
+      }
+      if (place % 10 === 3) {
+        return place + 'rd';
+      }
+      return place + 'th';
+    }
   }
 }
 </script>

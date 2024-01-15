@@ -1,23 +1,24 @@
 <template>
   <v-card>
     <v-card-title>
-      <span class="player_round_title_first_item">{{ player_round.player.name }}</span>
-      <span class="player_round_title_item">Round Score: {{ player_round.get_score() }}</span>
-      <span class="player_round_title_item">Game Score: {{ player_round.get_cumulative_score() }}</span>
+      <v-row>
+      <v-col cols="6">{{ player_round.player.name }}</v-col>
+      <v-col cols="6">Points: {{ player_round.get_score() }} / {{ player_round.get_cumulative_score() }} </v-col>
+    </v-row>
     </v-card-title>
-    <v-card-text>
-      <v-container fluid>
-        <v-row>
-          <v-col cols="3">
+    <v-card-text class="px-0 pb-2">
+        <v-row class="pa-0 ma-0">
+          <v-col cols="3" class="pa-0 ma-0 px-1">
+            <h4>Tricks</h4>
             <v-list>
               <v-list-item>
-                <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Tricks Bid:</b> {{
+                <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Bid:</b> {{
                   player_round.tricks_bid
                 }}</span>
                 <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1"
                   v-model="bid_dialog" persistent width="400">
                   <template v-slot:activator="{ props }">
-                    <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Set Bid</v-btn>
+                    <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Bid</v-btn>
                     <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
                   </template>
                   <v-card>
@@ -40,13 +41,13 @@
               </v-list-item>
               <v-list-item>
                 <span v-if="player_round.round.all_bids_placed()">
-                  <span class="trick_count" v-if="player_round.tricks_won != null"><b>Tricks Won:</b> {{
+                  <span class="trick_count" v-if="player_round.tricks_won != null"><b>Won:</b> {{
                     player_round.tricks_won
                   }}</span>
                   <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 2"
                     v-model="won_dialog" persistent width="400">
                     <template v-slot:activator="{ props }">
-                      <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Set Tricks Won</v-btn>
+                      <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Won</v-btn>
                       <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
                     </template>
                     <v-card>
@@ -70,16 +71,16 @@
               </v-list-item>
             </v-list>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="5" class="pa-0 ma-0">
             <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
-              <h3>Available Bonsues</h3>
+              <h4>Available Bonsues</h4>
               <v-chip-group>
                 <v-chip v-for="capture_bonus in available_capture_bonuses()" :key="capture_bonus"
                   @click="claim_bonus(capture_bonus)">{{ capture_bonus.name }} ( {{ capture_bonus.count }})</v-chip>
               </v-chip-group>
             </span>
             <span v-if="player_round.round.state >= 2">
-              <h3>Captured Bonsues</h3>
+              <h4>Bonsues</h4>
               <v-chip-group>
                 <v-chip v-for="(capture_bonus, index) in player_round.bonuses" :key="capture_bonus"
                   :closable="player_round.round.state == 2" @click:close="remove_bonus(capture_bonus, index)">{{
@@ -87,8 +88,8 @@
               </v-chip-group>
             </span>
           </v-col>
-          <v-col cols="3" v-if="!player_round.round.is_current_round() || player_round.round.state >= 2">
-            <h3>Alliances</h3>
+          <v-col cols="4" v-if="!player_round.round.is_current_round() || player_round.round.state >= 2" class="pa-0 ma-0">
+            <h4>Alliances</h4>
             <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
               <v-dialog v-model="alliance_dialog" width="400">
                 <template v-slot:activator="{ props }">
@@ -123,7 +124,6 @@
             </span>
           </v-col>
         </v-row>
-      </v-container>
     </v-card-text>
   </v-card>
 </template>

@@ -16,7 +16,7 @@
         </v-alert>
       </span>
     </v-card-title>
-    <v-card-text>
+    <v-card-text class="px-2">
       <PlayerRound v-for="player_round in round.player_rounds" :key="player_round" :player_round="player_round"
         :round_state="round_state" />
     </v-card-text>
@@ -26,7 +26,7 @@
       <v-card-title>
         Starting Round {{ round.round_number }}
       </v-card-title>
-      <v-card-text>
+      <v-card-text class="px-0">
         {{ yo_ho_ho_message }}
       </v-card-text>
     </v-card>
