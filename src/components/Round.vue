@@ -1,15 +1,15 @@
 <template>
   <v-card v-if="round != null">
     <v-card-title>
-      Round {{ round.round_number }}
-      <v-btn color="primary" v-if="round.state == 0" @click="on_click_start_round()" size="small">Start
+      Round {{ round.round_number }} of {{ round.game.number_of_rounds }}
+      <v-btn color="primary" v-if="round.state == 0" @click="on_click_start_round()" size="x-small" class="mx-2">Start
         Round</v-btn>
       <span v-if="round.state == 1 && round.all_bids_placed()">
-        <v-btn color="primary" @click="round.start_playing()" size="small">End
+        <v-btn color="primary" @click="round.start_playing()" size="x-small" class="mx-2">End
           Bidding</v-btn>
       </span>
       <span v-if="round.state == 2 && round.all_tricks_won_set()">
-        <v-btn color="primary" v-if="score_is_valid()" @click="end_round()" size="small">End
+        <v-btn color="primary" v-if="score_is_valid()" @click="end_round()" size="x-small" class="mx-2">End
           Round</v-btn>
         <v-alert class="multi-line" type="error" v-else>
           {{ end_game_error_message() }}
@@ -21,12 +21,12 @@
         :round_state="round_state" />
     </v-card-text>
   </v-card>
-  <v-dialog v-model="show_yo_ho_ho" width="195">
+  <v-dialog v-model="show_yo_ho_ho">
     <v-card>
       <v-card-title>
         Starting Round {{ round.round_number }}
       </v-card-title>
-      <v-card-text class="px-0">
+      <v-card-text>
         {{ yo_ho_ho_message }}
       </v-card-text>
     </v-card>

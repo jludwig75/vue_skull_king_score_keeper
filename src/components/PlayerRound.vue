@@ -2,128 +2,148 @@
   <v-card>
     <v-card-title>
       <v-row>
-      <v-col cols="6">{{ player_round.player.name }}</v-col>
-      <v-col cols="6">Points: {{ player_round.get_score() }} / {{ player_round.get_cumulative_score() }} </v-col>
-    </v-row>
+        <v-col cols="6">{{ player_round.player.name }}</v-col>
+        <v-col cols="6">Points: {{ player_round.get_score() }} / {{ player_round.get_cumulative_score() }} </v-col>
+      </v-row>
     </v-card-title>
     <v-card-text class="px-0 pb-2">
-        <v-row class="pa-0 ma-0">
-          <v-col cols="3" class="pa-0 ma-0 px-1">
-            <h4>Tricks</h4>
-            <v-list>
-              <v-list-item>
-                <span class="trick_count" v-if="player_round.tricks_bid != null"><b>Bid:</b> {{
-                  player_round.tricks_bid
-                }}</span>
-                <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1"
-                  v-model="bid_dialog" persistent width="400">
-                  <template v-slot:activator="{ props }">
-                    <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Bid</v-btn>
-                    <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
-                  </template>
-                  <v-card>
-                    <v-card-title>
-                      Set Bid
-                    </v-card-title>
-                    <v-card-text>
-                      <span class="clickable-icon" v-for="index in bid_options()" :key="index"
-                        @click="set_bid_count(index)">{{
-                          index
-                        }}</span>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-btn color="blue-darken-1" variant="text" @click="bid_dialog = false">
-                        Cancel
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-              </v-list-item>
-              <v-list-item>
-                <span v-if="player_round.round.all_bids_placed()">
-                  <span class="trick_count" v-if="player_round.tricks_won != null"><b>Won:</b> {{
-                    player_round.tricks_won
-                  }}</span>
-                  <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 2"
-                    v-model="won_dialog" persistent width="400">
-                    <template v-slot:activator="{ props }">
-                      <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Won</v-btn>
-                      <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
-                    </template>
-                    <v-card>
-                      <v-card-title>
-                        Set Tricks Won
-                      </v-card-title>
-                      <v-card-text>
-                        <span class="clickable-icon" v-for="index in bid_options()" :key="index"
-                          @click="set_won_count(index)">{{
-                            index
-                          }}</span>
-                      </v-card-text>
-                      <v-card-actions>
-                        <v-btn color="blue-darken-1" variant="text" @click="won_dialog = false">
-                          Cancel
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </span>
-              </v-list-item>
-            </v-list>
-          </v-col>
-          <v-col cols="5" class="pa-0 ma-0">
-            <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
-              <h4>Available Bonsues</h4>
-              <v-chip-group>
-                <v-chip v-for="capture_bonus in available_capture_bonuses()" :key="capture_bonus"
-                  @click="claim_bonus(capture_bonus)">{{ capture_bonus.name }} ( {{ capture_bonus.count }})</v-chip>
-              </v-chip-group>
-            </span>
-            <span v-if="player_round.round.state >= 2">
-              <h4>Bonsues</h4>
-              <v-chip-group>
-                <v-chip v-for="(capture_bonus, index) in player_round.bonuses" :key="capture_bonus"
-                  :closable="player_round.round.state == 2" @click:close="remove_bonus(capture_bonus, index)">{{
-                    capture_bonus.name }} (+{{ capture_bonus.points }} points)</v-chip>
-              </v-chip-group>
-            </span>
-          </v-col>
-          <v-col cols="4" v-if="!player_round.round.is_current_round() || player_round.round.state >= 2" class="pa-0 ma-0">
-            <h4>Alliances</h4>
-            <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
-              <v-dialog v-model="alliance_dialog" width="400">
+      <v-row class="pa-0 ma-0">
+        <v-col cols="3" class="pa-0 ma-0 px-1">
+          <h4>Tricks</h4>
+          <v-list>
+            <v-list-item class="px-2">
+              <span v-if="player_round.tricks_bid != null"><b>Bid:</b> {{
+                player_round.tricks_bid
+              }}</span>
+              <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 1" v-model="bid_dialog"
+                persistent width="400">
                 <template v-slot:activator="{ props }">
-                  <v-btn v-bind="props" size="small">Add Alliance</v-btn>
+                  <v-btn v-if="player_round.tricks_bid == null" v-bind="props" size="small">Bid</v-btn>
+                  <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
                 </template>
                 <v-card>
                   <v-card-title>
-                    Select a player to form an alliance with
+                    Set Bid
                   </v-card-title>
                   <v-card-text>
-                    <v-list>
-                      <v-list-item class="clickable-icon" v-for="player in get_other_players()" :key="player"
-                        @click="add_alliance(player)">{{ player.name }}</v-list-item>
-                    </v-list>
+                    <span class="clickable-icon" v-for="index in bid_options()" :key="index"
+                      @click="set_bid_count(index)">{{
+                        index
+                      }}</span>
                   </v-card-text>
                   <v-card-actions>
-                    <v-btn color="blue-darken-1" variant="text" @click="alliance_dialog = false">
+                    <v-btn color="blue-darken-1" variant="text" @click="bid_dialog = false">
                       Cancel
                     </v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-            </span>
-            <span v-if="player_round.round.state >= 2">
-              <v-chip-group>
-                <v-chip v-for="alliance in player_round.alliances" :key="alliance"
-                  :closable="player_round.round.is_current_round() && player_round.round.state == 2"
-                  @click:close="remove_alliance(alliance)">
-                  {{ alliance.player1.name + ' <-> ' + alliance.player2.name }}
-                </v-chip>
-              </v-chip-group>
-            </span>
-          </v-col>
-        </v-row>
+            </v-list-item>
+            <v-list-item class="px-2">
+              <span v-if="player_round.round.all_bids_placed()">
+                <span v-if="player_round.tricks_won != null"><b>Won:</b> {{
+                  player_round.tricks_won
+                }}</span>
+                <v-dialog v-if="player_round.round.is_current_round() && player_round.round.state == 2"
+                  v-model="won_dialog" persistent width="400">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-if="player_round.tricks_won == null" v-bind="props" size="small">Won</v-btn>
+                    <v-btn v-else v-bind="props" icon size="x-small"><v-icon>mdi-pencil</v-icon></v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      Set Tricks Won
+                    </v-card-title>
+                    <v-card-text>
+                      <span class="clickable-icon" v-for="index in bid_options()" :key="index"
+                        @click="set_won_count(index)">{{
+                          index
+                        }}</span>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-btn color="blue-darken-1" variant="text" @click="won_dialog = false">
+                        Cancel
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </span>
+            </v-list-item>
+          </v-list>
+        </v-col>
+        <v-col cols="4" class="pa-0 ma-0">
+          <span>
+            <h4>Bonsues</h4>
+            <v-dialog v-model="bonus_dialog"
+              v-if="player_round.round.is_current_round() && player_round.round.state == 2">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" size="x-small" @click="bonus_dialog = true"><v-icon>mdi-plus</v-icon></v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  Claim a Bonus for {{ player_round.player.name }}
+                </v-card-title>
+                <v-card-text>
+                  <v-chip-group>
+                    <v-chip v-for="bonus in available_capture_bonuses()" :key="bonus" @click="claim_bonus(bonus)"
+                      size="small" :class="bonus_class(bonus)">{{ bonus_text(bonus) }} ( {{ bonus.count
+                      }})</v-chip>
+                  </v-chip-group>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="blue-darken-1" variant="text" @click="bonus_dialog = false">
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </span>
+          <span v-if="player_round.round.state >= 2">
+            <v-chip-group>
+              <v-chip v-for="(capture_bonus, index) in player_round.bonuses" :key="capture_bonus" size="small"
+                :class="bonus_class(capture_bonus)"><v-icon class="mr-2"
+                  v-if="player_round.round.is_current_round() && player_round.round.state == 2" left
+                  @click="remove_bonus(capture_bonus, index)">mdi-close-circle</v-icon>{{
+                    bonus_text(capture_bonus) }} (+{{ capture_bonus.points }} pts)</v-chip>
+            </v-chip-group>
+          </span>
+        </v-col>
+        <v-col cols="5" v-if="!player_round.round.is_current_round() || player_round.round.state >= 2" class="pa-0 ma-0">
+          <h4>Alliances</h4>
+          <span v-if="player_round.round.is_current_round() && player_round.round.state == 2">
+            <v-dialog v-model="alliance_dialog" width="400">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" size="x-small"><v-icon>mdi-plus</v-icon></v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  Select a player to form an alliance with
+                </v-card-title>
+                <v-card-text>
+                  <v-list>
+                    <v-list-item class="clickable-icon" v-for="player in get_other_players()" :key="player"
+                      @click="add_alliance(player)">{{ player.name }}</v-list-item>
+                  </v-list>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="blue-darken-1" variant="text" @click="alliance_dialog = false">
+                    Cancel
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </span>
+          <span v-if="player_round.round.state >= 2">
+            <v-chip-group>
+              <v-chip v-for="alliance in player_round.alliances" :key="alliance" size="small">
+                <v-icon class="mr-2" v-if="player_round.round.is_current_round() && player_round.round.state == 2" left
+                  @click="remove_alliance(alliance)">mdi-close-circle</v-icon>{{ alliance.player1.name + ' <-> ' +
+                    alliance.player2.name }}
+              </v-chip>
+            </v-chip-group>
+          </span>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
@@ -141,6 +161,7 @@ export default {
     return {
       bid_dialog: false,
       won_dialog: false,
+      bonus_dialog: false,
       alliance_dialog: false,
     }
   },
@@ -163,6 +184,9 @@ export default {
       }
       if (this.alliance_dialog && e.key === 'Escape') {
         this.alliance_dialog = false;
+      }
+      if (this.bonus_dialog && e.key === 'Escape') {
+        this.bonus_dialog = false;
       }
     },
     bid_options() {
@@ -191,6 +215,7 @@ export default {
     },
     claim_bonus(bonus) {
       this.player_round.claim_bonus(bonus);
+      this.bonus_dialog = false;
     },
     remove_bonus(bonus, index) {
       this.player_round.relinquish_bonus(bonus, index);
@@ -211,6 +236,42 @@ export default {
     },
     remove_alliance(alliance) {
       this.player_round.remove_alliance(alliance);
+    },
+    bonus_class(bonus) {
+      if (bonus.name === 'Green 14') {
+        return 'green-14';
+      } else if (bonus.name === 'Yellow 14') {
+        return 'yellow-14';
+      } else if (bonus.name === 'Purple 14') {
+        return 'purple-14';
+      } else if (bonus.name === 'Black 14') {
+        return 'black-14';
+      } else if (bonus.name === 'Skull King') {
+        return 'skull-king';
+      } else if (bonus.name === 'Pirate') {
+        return 'pirate';
+      } else if (bonus.name === 'Mermaid') {
+        return 'mermaid';
+      }
+      return '';
+    },
+    bonus_text(bonus) {
+      if (bonus.name === 'Green 14') {
+        return '14';
+      } else if (bonus.name === 'Yellow 14') {
+        return '14';
+      } else if (bonus.name === 'Purple 14') {
+        return '14';
+      } else if (bonus.name === 'Black 14') {
+        return '14';
+      } else if (bonus.name === 'Skull King') {
+        return 'SK';
+      } else if (bonus.name === 'Pirate') {
+        return 'P';
+      } else if (bonus.name === 'Mermaid') {
+        return 'M';
+      }
+      return '';
     },
   }
 }
@@ -243,5 +304,40 @@ export default {
   padding-bottom: 0.6em;
   margin-left: 0.4em;
   margin-right: 0.4em;
+}
+
+.yellow-14 {
+  background-color: yellow;
+  color: black;
+}
+
+.green-14 {
+  background-color: green;
+  color: white;
+}
+
+.purple-14 {
+  background-color: purple;
+  color: white;
+}
+
+.black-14 {
+  background-color: black;
+  color: white;
+}
+
+.skull-king {
+  background-color: black;
+  color: white;
+}
+
+.pirate {
+  background-color: red;
+  color: white;
+}
+
+.mermaid {
+  background-color: aqua;
+  color: black;
 }
 </style>

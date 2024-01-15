@@ -42,9 +42,8 @@
       Game Settings
     </v-card-title>
     <v-card-text>
-      <b>Number of Rounds:</b> {{ game.number_of_rounds }}
-      <v-slider v-model="game.number_of_rounds" :min="1" :max="10" :step="1" thumb-label show-ticks="always"
-        tick-size="1">
+      <b>Number of Rounds:</b> {{ number_of_rounds }}
+      <v-slider v-model="number_of_rounds" :min="1" :max="10" :step="1" thumb-label show-ticks="always" tick-size="1">
       </v-slider>
     </v-card-text>
   </v-card>
@@ -84,6 +83,7 @@ export default {
       new_player_name: '',
       disable_game_save: false,
       game_complete: false,
+      number_of_rounds: 10,
     };
   },
   mounted() {
@@ -119,6 +119,7 @@ export default {
       console.log('create_new_game changed. old: ' + oldValue + ' new: ' + newValue);
       if (newValue === oldValue + 1) {
         this.game = new Game();
+        this.number_of_rounds = 10;
       }
     }
   },
@@ -133,6 +134,10 @@ export default {
       this.dialog = false;
     },
     start_round() {
+      if (this.game.rounds.length == 0) {
+        this.game.number_of_rounds = this.number_of_rounds;
+        this.number_of_rounds = 10;
+      }
       this.game.start_next_round();
     },
     delete_player(index) {

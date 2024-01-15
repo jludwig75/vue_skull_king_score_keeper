@@ -9,13 +9,13 @@
     <v-list>
       <v-list-item v-for="player_result in results.results" :key="player_result">
         <v-row>
-          <v-col cols="1">
+          <v-col cols="3">
             {{ place_string(player_result.place) }}
           </v-col>
-          <v-col cols="2">
+          <v-col cols="6">
             {{ player_result.player.name }}
           </v-col>
-          <v-col cols="1">
+          <v-col cols="3">
             {{ player_result.score }}
           </v-col>
         </v-row>
