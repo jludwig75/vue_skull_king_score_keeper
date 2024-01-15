@@ -1,16 +1,16 @@
 <template>
   <v-card>
-    <v-card-title>
+    <v-card-title class="px-3 py-2">
       <v-row>
         <v-col cols="6">{{ player_round.player.name }}</v-col>
         <v-col cols="6">Points: {{ player_round.get_score() }} / {{ player_round.get_cumulative_score() }} </v-col>
       </v-row>
     </v-card-title>
-    <v-card-text class="px-0 pb-2">
+    <v-card-text class="px-0 pb-1">
       <v-row class="pa-0 ma-0">
         <v-col cols="3" class="pa-0 ma-0 px-1">
           <h4>Tricks</h4>
-          <v-list>
+          <v-list class="py-0">
             <v-list-item class="px-2">
               <span v-if="player_round.tricks_bid != null"><b>Bid:</b> {{
                 player_round.tricks_bid
@@ -86,8 +86,10 @@
                 <v-card-text>
                   <v-chip-group>
                     <v-chip v-for="bonus in available_capture_bonuses()" :key="bonus" @click="claim_bonus(bonus)"
-                      size="small" :class="bonus_class(bonus)">{{ bonus_text(bonus) }} ( {{ bonus.count
-                      }})</v-chip>
+                      size="small" :class="bonus_class(bonus)"><v-icon
+                        v-if="bonus_icon(bonus)">{{ bonus_icon(bonus) }}</v-icon><span v-else>{{
+                          bonus_text(bonus) }}</span> ( {{ bonus.count
+  }})</v-chip>
                   </v-chip-group>
                 </v-card-text>
                 <v-card-actions>
@@ -103,8 +105,9 @@
               <v-chip v-for="(capture_bonus, index) in player_round.bonuses" :key="capture_bonus" size="small"
                 :class="bonus_class(capture_bonus)"><v-icon class="mr-2"
                   v-if="player_round.round.is_current_round() && player_round.round.state == 2" left
-                  @click="remove_bonus(capture_bonus, index)">mdi-close-circle</v-icon>{{
-                    bonus_text(capture_bonus) }} (+{{ capture_bonus.points }} pts)</v-chip>
+                  @click="remove_bonus(capture_bonus, index)" size="small">mdi-close-circle</v-icon><v-icon
+                  v-if="bonus_icon(capture_bonus)">{{ bonus_icon(capture_bonus) }}</v-icon><span v-else>{{
+                    bonus_text(capture_bonus) }}</span><span class="pl-2">+{{ capture_bonus.points }} pts</span></v-chip>
             </v-chip-group>
           </span>
         </v-col>
@@ -272,6 +275,16 @@ export default {
         return 'M';
       }
       return '';
+    },
+    bonus_icon(bonus) {
+      if (bonus.name === 'Skull King') {
+        return 'mdi-crown';
+      } else if (bonus.name === 'Pirate') {
+        return 'mdi-pirate';
+      } else if (bonus.name === 'Mermaid') {
+        return 'mdi-face-woman-shimmer-outline';
+      }
+      return null;
     },
   }
 }
