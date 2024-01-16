@@ -3,7 +3,8 @@
     <v-card-title class="px-3 py-2">
       <v-row>
         <v-col cols="6">{{ player_round.player.name }}</v-col>
-        <v-col cols="6">Points: {{ player_round.get_score() }} / {{ player_round.get_cumulative_score() }} </v-col>
+        <v-col cols="6" v-if="player_round.round.state != 0">Points: {{ player_round.get_score() }} / {{
+          player_round.get_cumulative_score() }} </v-col>
       </v-row>
     </v-card-title>
     <v-card-text class="px-0 pb-1">

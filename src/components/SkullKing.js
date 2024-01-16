@@ -376,18 +376,27 @@ class PlayerRound {
     }
 
     get_cumulative_score() {
-        let round_score = this.get_score();
-        if (round_score == null) {
+        let cumulative_score = 0;
+        if (this.round_number > 1) {
+            let previous_round = this.get_previous_player_round();
+            if (previous_round == null) {
+                console.error('Could not get round prior to ' + this.round_number);
+                return null;
+            }
+
+            cumulative_score = previous_round.get_cumulative_score();
+        }
+
+        if (cumulative_score == null) {
             return null;
         }
 
-
-        let previous_round = this.get_previous_player_round();
-        if (previous_round) {
-            return previous_round.get_cumulative_score() + round_score;
+        let round_score = this.get_score();
+        if (round_score != null) {
+            cumulative_score += round_score;
         }
 
-        return round_score;
+        return cumulative_score;
     }
 
     get_previous_player_round() {
