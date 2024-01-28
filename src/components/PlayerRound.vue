@@ -7,7 +7,7 @@
           player_round.get_cumulative_score() }} </v-col>
       </v-row>
     </v-card-title>
-    <v-card-text class="px-0 pb-1">
+    <v-card-text class="px-1 pb-1">
       <v-row class="pa-0 ma-0" v-if="player_round.round.state > 0">
         <v-col cols="3" class="pa-0 ma-0 px-1">
           <h4>Tricks</h4>
