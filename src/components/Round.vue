@@ -1,6 +1,6 @@
 <template>
-  <v-card v-if="round != null">
-    <v-card-title>
+  <div class="game-outer" v-if="round != null">
+    <h2>
       Round {{ round.round_number }} of {{ round.game.number_of_rounds }}
       <v-btn color="primary" v-if="round.state == 0" @click="on_click_start_round()" size="x-small" class="mx-2">Start
         Round</v-btn>
@@ -15,12 +15,10 @@
           {{ end_game_error_message() }}
         </v-alert>
       </span>
-    </v-card-title>
-    <v-card-text class="mx-0 px-0">
-      <PlayerRound v-for="player_round in round.player_rounds" :key="player_round" :player_round="player_round"
-        :round_state="round_state" />
-    </v-card-text>
-  </v-card>
+    </h2>
+    <PlayerRound v-for="player_round in round.player_rounds" :key="player_round" :player_round="player_round"
+      :round_state="round_state" />
+  </div>
   <v-dialog v-model="show_yo_ho_ho">
     <v-card>
       <v-card-title>

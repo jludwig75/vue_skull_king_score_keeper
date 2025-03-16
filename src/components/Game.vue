@@ -1,61 +1,55 @@
 <template>
-  <v-card v-if="game.rounds.length == 0">
-    <v-card-title>
+  <div class="game-outer" v-if="game.rounds.length == 0">
+    <h2>
       Players
-    </v-card-title>
-    <v-card-text>
-      <v-chip-group>
-        <v-chip v-for="(player, index) in game.players" :key="player" :closable="game.rounds.length == 0"
-          @click:close="delete_player(index)">
-          {{ player.name }}
-        </v-chip>
-      </v-chip-group>
-      <v-dialog v-model="dialog" persistent width="400">
-        <template v-slot:activator="{ props }">
-          <v-btn color="primary" v-bind="props" v-if="game.players.length < 8 && game.rounds.length == 0">
-            Add Player
+    </h2>
+    <v-chip-group>
+      <v-chip v-for="(player, index) in game.players" :key="player" :closable="game.rounds.length == 0"
+        @click:close="delete_player(index)">
+        {{ player.name }}
+      </v-chip>
+    </v-chip-group>
+    <v-dialog v-model="dialog" persistent width="400">
+      <template v-slot:activator="{ props }">
+        <v-btn size="small" color="primary" v-bind="props" v-if="game.players.length < 8 && game.rounds.length == 0">
+          Add Player
+        </v-btn>
+      </template>
+      <v-card>
+        <v-card-title>
+          Add Player
+        </v-card-title>
+        <v-card-text>
+          <v-text-field label="Player Name" required v-model="new_player_name" autofocus
+            @keyup.enter="on_dialog_add_button()" />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue-darken-1" variant="text" @click="close_dialog()">
+            Cancel
           </v-btn>
-        </template>
-        <v-card>
-          <v-card-title>
-            Add Player
-          </v-card-title>
-          <v-card-text>
-            <v-text-field label="Player Name" required v-model="new_player_name" autofocus
-              @keyup.enter="on_dialog_add_button()" />
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue-darken-1" variant="text" @click="close_dialog()">
-              Cancel
-            </v-btn>
-            <v-btn color="blue-darken-1" variant="text" @click="on_dialog_add_button()">
-              Add
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-card-text>
-  </v-card>
-  <v-card v-if="game.rounds.length == 0">
-    <v-card-title>
+          <v-btn color="blue-darken-1" variant="text" @click="on_dialog_add_button()">
+            Add
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+  <div class="game-outer" v-if="game.rounds.length == 0">
+    <h2 style="margin-bottom: 0.3em;">
       Game Settings
-    </v-card-title>
-    <v-card-text>
-      <b>Number of Rounds:</b> {{ number_of_rounds }}
-      <v-slider v-model="number_of_rounds" :min="1" :max="10" :step="1" thumb-label show-ticks="always" tick-size="1">
-      </v-slider>
-    </v-card-text>
-  </v-card>
+    </h2>
+    <b>Number of Rounds:</b> {{ number_of_rounds }}
+    <v-slider v-model="number_of_rounds" :min="1" :max="10" :step="1" thumb-label show-ticks="always" tick-size="1">
+    </v-slider>
+  </div>
   <Round v-for="round in game.rounds" :key="round" :round="round" @endRound="on_round_complete()" />
-  <v-card v-if="game.can_start_new_round()">
-    <v-card-text>
-      <v-btn color="primary" v-if="game.can_start_new_round()" @click="start_round()">
+  <div class="game-outer" v-if="game.can_start_new_round()">
+    <v-btn color="primary" v-if="game.can_start_new_round()" @click="start_round()">
         <span v-if="game.rounds.length == 0">Start Game</span>
         <span v-else>Go To Next Round</span>
       </v-btn>
-    </v-card-text>
-  </v-card>
+  </div>
   <GameResults v-if="game.is_complete()" :results="game.results"></GameResults>
   <v-dialog v-model="game_results_dialog" width="600">
     <GameResults v-if="game.is_complete()" :results="game.results"></GameResults>
