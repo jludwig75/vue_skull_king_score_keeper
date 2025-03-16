@@ -8,10 +8,10 @@
       </v-row>
     </v-card-title>
     <v-card-text class="px-2 pb-1">
-      <!-- Bids/Alliances -->
-      <v-row class="pa-0 ma-0" v-if="player_round.round.state > 0">
+      <!-- Tricks/Alliances -->
+      <v-row class="pa-0 ma-0 my-1" v-if="player_round.round.state > 0">
 
-        <!-- Bids -->
+        <!-- Tricks -->
         <v-col cols="5" class="pa-0 ma-0 px-1">
           <h3>Tricks</h3>
           <span
@@ -76,7 +76,7 @@
               </span>
             </div>
           </span>
-          <span v-else>
+          <span class="ml-2 my-2" v-else>
             <span v-if="player_round.round.state > 2">
               {{ player_round.tricks_won }} / {{ player_round.tricks_bid }}
             </span>
